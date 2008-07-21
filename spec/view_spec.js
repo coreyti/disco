@@ -185,7 +185,8 @@ Screw.Unit(function() {
     describe("#subview", function() {
       var view;
       var initialization_order;
-
+      var initial_attributes_of_template_1_during_after_intialize;
+      
       var template_1 = {
         content: function(builder) {
           with(builder) {
@@ -202,6 +203,8 @@ Screw.Unit(function() {
 
           after_initialize: function() {
             initialization_order.push(this);
+            initial_attributes_of_template_1_during_after_intialize['bar'] = this.bar;
+            initial_attributes_of_template_1_during_after_intialize['bing'] = this.bing;
           }
         }
       }
@@ -225,10 +228,11 @@ Screw.Unit(function() {
       describe("within a view that wraps a single element", function() {
         before(function() {
           initialization_order = [];
+          initial_attributes_of_template_1_during_after_intialize = {};
           view = Disco.View.build(function(builder) {
             with(builder) {
               div({'class': "foo"}, function() {
-                subview('subview', template_1);
+                subview('subview', template_1, { bar: "baz", bing: "bop" });
               });
             }
           });
@@ -248,6 +252,13 @@ Screw.Unit(function() {
 
         it("calls after initialize on each view object if it exists, starting with the lowest subview first", function() {
           expect(initialization_order).to(equal, [view.subview.subview, view.subview]);
+        });
+        
+        it('assigns the elements of the initial_attributes hash to the view before after_initialize is called', function() {
+          expect(initial_attributes_of_template_1_during_after_intialize.bar).to(equal, 'baz')
+          expect(initial_attributes_of_template_1_during_after_intialize.bing).to(equal, 'bop')
+          expect(view.subview.bar).to(equal, 'baz');
+          expect(view.subview.bing).to(equal, 'bop');
         });
       });
 
