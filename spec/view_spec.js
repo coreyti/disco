@@ -260,6 +260,10 @@ Screw.Unit(function() {
           expect(view.subview.bar).to(equal, 'baz');
           expect(view.subview.bing).to(equal, 'bop');
         });
+
+        it("sets the parent view on the subview", function() {
+          expect(view.subview.parent).to(equal, view);
+        });
       });
 
       describe("within a view that wraps multiple elements", function() {
@@ -286,6 +290,67 @@ Screw.Unit(function() {
           expect(view.subview.length).to(equal, 1);
           expect(view.subview.subview).to(match_selector, 'div.foo > div.bar > span.baz');
           expect(view.subview.subview.length).to(equal, 1);
+        });
+      });
+    });
+
+    describe("#keyed_subview", function() {
+      var view;
+      var initialization_order;
+      var initial_attributes_of_template_1_during_after_intialize;
+
+      var template_1 = {
+        content: function(builder) {
+          builder.div({'class': "bar"});
+        },
+
+        methods: {
+          foo: function() {
+            return "bar"
+          },
+
+          after_initialize: function() {
+            initialization_order.push(this);
+            initial_attributes_of_template_1_during_after_intialize['bar'] = this.bar;
+            initial_attributes_of_template_1_during_after_intialize['bing'] = this.bing;
+          }
+        }
+      }
+
+      var template_2 = {
+        content: function(builder) {
+          builder.span({'class': "baz"});
+        },
+
+        methods: {
+          baz: function() {
+            return "bop"
+          },
+
+          after_initialize: function() {
+            initialization_order.push(this);
+          }
+        }
+      }
+
+      describe("within a view that wraps a single element", function() {
+        before(function() {
+          initialization_order = [];
+          initial_attributes_of_template_1_during_after_intialize = {};
+          view = Disco.View.build(function(builder) {
+            with(builder) {
+              div({'class': "foo"}, function() {
+                keyed_subview('subviews', 1, template_1, { bar: "baz", bing: "bop" });
+                keyed_subview('subviews', 2, template_2, { bar: "boof" });
+              });
+            }
+          });
+        });
+
+        it("registers the provided subview at the given key", function() {
+          expect(view.subviews).to_not(equal, undefined);
+          expect(view.subviews[1].bar).to(equal, "baz");
+          expect(view.subviews[2].bar).to(equal, "boof");
         });
       });
     });
