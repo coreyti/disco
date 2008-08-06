@@ -427,22 +427,30 @@ Screw.Unit(function() {
         expect(times_called).to(equal, 1);
       });
     });
-    
-    describe("#click", function() {
-      it("calls bind with the 'click' type and a closure that captures the current view", function() {
-        var view_argument;
 
-        with(builder) {
-          div({'class': "foo"}, function() {
-            div({'class': "bar"}).click(function(event, view) {
-              view_argument = view;
-            })
-          });
+    describe("all event handlers supported in jQuery 1.2.3", function() {
+
+      it("have a corresponding method on the builder that inserts a bind metatag for that event type", function() {
+        var event_types = ["blur", "change", "click", "dblclick", "error", "focus", "keydown",
+          "keypress", "keyup", "load", "mousedown", "mousemove", "mouseout", "mouseover", "mouseup",
+          "resize", "scroll", "select", "submit", "unload"]
+
+        for (var i = 0; i < event_types.length; i++) {
+          var event_type = event_types[i];
+          var view_argument;
+
+          with(builder) {
+            div({'class': "foo"}, function() {
+              div({'class': "bar"})[event_type](function(event, view) {
+                view_argument = view;
+              })
+            });
+          }
+
+          var view = builder.to_view();
+          view.find('div.bar').trigger(event_type);
+          expect(view_argument).to(equal, view);
         }
-
-        var view = builder.to_view();
-        view.find('div.bar').click();
-        expect(view_argument).to(equal, view);
       });
     });
   });
