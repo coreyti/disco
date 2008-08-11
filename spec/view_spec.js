@@ -81,31 +81,43 @@ Screw.Unit(function() {
     });
 
     describe(".build", function() {
-      it("when passed a function, calls the function with a builder and returns a view", function() {
-        var view = Disco.View.build(function(builder) {
-          with(builder) {
-            div({'class': "foo"}, function() {
-              div({'class': "bar"});
-            });
-          }
+      describe('when passed a function', function() {
+        it("calls the function with a builder and returns a view", function() {
+          var view = Disco.View.build(function(builder) {
+            with(builder) {
+              div({'class': "foo"}, function() {
+                div({'class': "bar"});
+              });
+            }
+          });
+
+          expect(view).to(match_selector, 'div.foo');
+          expect(view).to(contain_selector, 'div.bar');
         });
 
-        expect(view).to(match_selector, 'div.foo');
-        expect(view).to(contain_selector, 'div.bar');
+        it("when the function renders no content to the builder, returns an empty string instead of the view", function() {
+          var view = Disco.View.build(function(builder) { /* noop */ });
+          expect(view).to(equal, "");
+        });
       });
-
-      it("when passed a function and initial attributes, returns a view with the attributes set", function() {
-        var content = function(builder) {
-          builder.div({'class': "foo"});
-        };
-        var view = Disco.View.build(content, { foo: 'bar', baz: 'quux' });
-        expect(view.foo).to(equal, 'bar');
-        expect(view.baz).to(equal, 'quux');
-      });
-
-      it("when passed a function that renders no content to the builder, returns the empty string instead of the view", function() {
-        var view = Disco.View.build(function(builder) { /* noop */});
-        expect(view).to(equal, "");
+      
+      describe('when passed a function and a hash of instance attributes', function() {
+        it('returns a view with the attributes set', function() {
+          var content = function(builder) {
+            builder.div({'class': "foo"});
+          };
+          var view = Disco.View.build(content, { foo: 'bar', baz: 'quux' });
+          expect(view.foo).to(equal, 'bar');
+          expect(view.baz).to(equal, 'quux');
+        });
+        
+        it('passes the attributes as arguments to the content template', function() {
+          var content = function(builder, initial_attributes) {
+            builder.div(initial_attributes.foo);
+          }
+          var view = Disco.View.build(content, { foo: 'bar' });
+          expect(view.html()).to(equal, 'bar');
+        });
       });
 
       describe("when passed a template", function() {
@@ -152,8 +164,8 @@ Screw.Unit(function() {
         var view, variables, variables_at_time_of_call;
               
         var template = {
-          content: function(builder) {
-            builder.div({'class': "foo"});
+          content: function(builder, initial_attributes) {
+            builder.div(initial_attributes.foo, {'class': "foo"});
           },
           
           methods: {
@@ -178,8 +190,12 @@ Screw.Unit(function() {
           expect(view.baz).to(equal, variables.baz);
           expect(variables_at_time_of_call).to(equal, variables);
         });
+
+        it('passes the attributes as arguments to the content template', function() {
+          var view = Disco.View.build(template, variables);
+          expect(view.html()).to(equal, 'bar');
+        });
       })
-      
     });
 
     describe("#subview", function() {
@@ -191,7 +207,7 @@ Screw.Unit(function() {
         content: function(builder) {
           with(builder) {
             div({'class': "bar"}, function() {
-              subview('subview', template_2)
+              subview('subview', template_2, { subcontent: 'subview content'})
             });
           }
         },
@@ -210,8 +226,8 @@ Screw.Unit(function() {
       }
 
       var template_2 = {
-        content: function(builder) {
-          builder.span({'class': "baz"});
+        content: function(builder, initial_attributes) {
+          builder.span(initial_attributes.subcontent, {'class': "baz"});
         },
 
         methods: {
@@ -259,6 +275,10 @@ Screw.Unit(function() {
           expect(initial_attributes_of_template_1_during_after_intialize.bing).to(equal, 'bop')
           expect(view.subview.bar).to(equal, 'baz');
           expect(view.subview.bing).to(equal, 'bop');
+        });
+
+        it('passes the initial_attributes hash to the content template', function() {
+          expect(view.subview.subview.html()).to(equal, "subview content");
         });
 
         it("sets the parent view on the subview", function() {
@@ -318,8 +338,8 @@ Screw.Unit(function() {
       }
 
       var template_2 = {
-        content: function(builder) {
-          builder.span({'class': "baz"});
+        content: function(builder, initial_attributes) {
+          builder.span(initial_attributes.bar, {'class': "baz"});
         },
 
         methods: {
@@ -351,6 +371,10 @@ Screw.Unit(function() {
           expect(view.subviews).to_not(equal, undefined);
           expect(view.subviews[1].bar).to(equal, "baz");
           expect(view.subviews[2].bar).to(equal, "boof");
+        });
+
+        it('passes the initial_attributes hash to the content template', function() {
+          expect(view.subviews[2].html()).to(equal, "boof");
         });
       });
     });
