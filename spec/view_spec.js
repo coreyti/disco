@@ -80,6 +80,71 @@ Screw.Unit(function() {
       });
     });
 
+    describe(".inherit", function() {
+      var layout, template, merged_template, after_initialize_calls;
+      
+      before(function() {
+        after_initialize_calls = [];
+        layout = {
+          content: function(builder, initial_attributes) {
+            with(builder) {
+              this.header(builder);
+              this.wrapped_content(builder);
+            }
+          },
+          header: function(builder) {
+            builder.h1("Hello " + this.name);
+          },
+          name: function() {
+            return 'world';
+          },
+          methods: {
+            after_initialize: function() {
+              after_initialize_calls.push([this, 'layout']);
+            },
+            method_one: function() {}
+          }
+        };
+        template = {
+          wrapped_content: function(builder, initial_attributes) {
+          },
+          name: function() {
+            return 'mars';
+          },
+          methods: {
+            after_initialize: function() {
+              after_initialize_calls.push([this, 'template']);
+            },
+            method_two: function() {}
+          }
+        };
+        merged_template = Disco.View.inherit(layout, template);
+      });
+      
+      describe("when passed a layout and an inheriting template", function() {
+        it("extends the inheriting template with the top level methods of the layout", function() {
+          expect(merged_template.content).to(equal, layout.content);
+          expect(merged_template.header).to(equal, layout.header);
+        });
+        
+        it("overrides methods in the layout with methods in the template that share the same name", function() {
+          expect(merged_template.name).to_not(equal, layout.name);
+          expect(merged_template.name).to(equal, template.name);
+        });
+        
+        it("extends the methods hash of the inheriting template with the methods hash of the layout", function() {
+          expect(merged_template.methods.method_one).to(equal, layout.methods.method_one);
+          expect(merged_template.methods.method_two).to(equal, template.methods.method_two);
+        });
+        
+        it("combines the after_initialize methods of the layout and inheriting template, executing the layout's method first", function() {
+          expect(merged_template.methods.after_initialize).to_not(equal, undefined);
+          var view = Disco.View.build(merged_template);
+          expect(after_initialize_calls).to(equal, [[view, 'layout'], [view, 'template']]);
+        });
+      })
+    });
+
     describe(".build", function() {
       describe('when passed a function', function() {
         it("calls the function with a builder and returns a view", function() {
