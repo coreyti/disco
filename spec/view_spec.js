@@ -103,6 +103,9 @@ Screw.Unit(function() {
               after_initialize_calls.push([this, 'layout']);
             },
             method_one: function() {}
+          },
+          configuration: {
+            config_one: 'i am the first configuration'
           }
         };
         template = {
@@ -116,6 +119,9 @@ Screw.Unit(function() {
               after_initialize_calls.push([this, 'template']);
             },
             method_two: function() {}
+          },
+          configuration: {
+            config_two: 'second configuration'
           }
         };
         merged_template = Disco.View.inherit(layout, template);
@@ -135,6 +141,11 @@ Screw.Unit(function() {
         it("extends the methods hash of the inheriting template with the methods hash of the layout", function() {
           expect(merged_template.methods.method_one).to(equal, layout.methods.method_one);
           expect(merged_template.methods.method_two).to(equal, template.methods.method_two);
+        });
+        
+        it("overrides configuration in the layout with configuration in the template that share the same name", function() {
+          expect(merged_template.configuration.config_one).to(equal, layout.configuration.config_one);
+          expect(merged_template.configuration.config_two).to(equal, template.configuration.config_two);
         });
         
         it("combines the after_initialize methods of the layout and inheriting template, executing the layout's method first", function() {
