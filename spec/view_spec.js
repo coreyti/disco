@@ -138,12 +138,12 @@ Screw.Unit(function() {
           expect(merged_template.name).to(equal, template.name);
         });
         
-        it("extends the methods hash of the inheriting template with the methods hash of the layout", function() {
+        it("combines the methods hashes of the layout and the inheriting template, giving priority to the inheriting template", function() {
           expect(merged_template.methods.method_one).to(equal, layout.methods.method_one);
           expect(merged_template.methods.method_two).to(equal, template.methods.method_two);
         });
         
-        it("overrides configuration in the layout with configuration in the template that share the same name", function() {
+        it("combines the configuration hashes of the layout and the inheriting template, giving priority to the inheriting template", function() {
           expect(merged_template.configuration.config_one).to(equal, layout.configuration.config_one);
           expect(merged_template.configuration.config_two).to(equal, template.configuration.config_two);
         });
@@ -215,6 +215,10 @@ Screw.Unit(function() {
             after_initialize: function() {
               this.after_initialize_called = true;
             }
+          },
+          
+          configuration: {
+            config_name: 'config value'
           }
         }
 
@@ -229,6 +233,10 @@ Screw.Unit(function() {
 
         it("attaches the template's methods to the returned view", function() {
           expect(view.foo()).to(equal, "bar");
+        });
+
+        it("attaches the template's configuration hash to the returned view", function() {
+          expect(view.configuration).to(equal, template.configuration);
         });
 
         it("calls after_initialize on the created view if the method exists", function() {
