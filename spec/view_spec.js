@@ -1,11 +1,11 @@
 //require("/specs/spec_helper");
 
 Screw.Unit(function() {
-  describe("Disco.View", function() {
+  describe("Disco", function() {
     var builder;
     before(function() {
       $('#screw_unit_content').html("");
-      builder = new Disco.View();
+      builder = new Disco();
     });
 
     describe("#tag", function() {
@@ -124,7 +124,7 @@ Screw.Unit(function() {
             config_two: 'second configuration'
           }
         };
-        merged_template = Disco.View.inherit(layout, template);
+        merged_template = Disco.inherit(layout, template);
       });
       
       describe("when passed a layout and an inheriting template", function() {
@@ -150,7 +150,7 @@ Screw.Unit(function() {
         
         it("combines the after_initialize methods of the layout and inheriting template, executing the layout's method first", function() {
           expect(merged_template.methods.after_initialize).to_not(equal, undefined);
-          var view = Disco.View.build(merged_template);
+          var view = Disco.build(merged_template);
           expect(after_initialize_calls).to(equal, [[view, 'layout'], [view, 'template']]);
         });
       })
@@ -159,7 +159,7 @@ Screw.Unit(function() {
     describe(".build", function() {
       describe('when passed a function', function() {
         it("calls the function with a builder and returns a view", function() {
-          var view = Disco.View.build(function(builder) {
+          var view = Disco.build(function(builder) {
             with(builder) {
               div({'class': "foo"}, function() {
                 div({'class': "bar"});
@@ -172,7 +172,7 @@ Screw.Unit(function() {
         });
 
         it("when the function renders no content to the builder, returns an empty string instead of the view", function() {
-          var view = Disco.View.build(function(builder) { /* noop */ });
+          var view = Disco.build(function(builder) { /* noop */ });
           expect(view).to(equal, "");
         });
       });
@@ -182,7 +182,7 @@ Screw.Unit(function() {
           var content = function(builder) {
             builder.div({'class': "foo"});
           };
-          var view = Disco.View.build(content, { foo: 'bar', baz: 'quux' });
+          var view = Disco.build(content, { foo: 'bar', baz: 'quux' });
           expect(view.foo).to(equal, 'bar');
           expect(view.baz).to(equal, 'quux');
         });
@@ -191,7 +191,7 @@ Screw.Unit(function() {
           var content = function(builder, initial_attributes) {
             builder.div(initial_attributes.foo);
           }
-          var view = Disco.View.build(content, { foo: 'bar' });
+          var view = Disco.build(content, { foo: 'bar' });
           expect(view.html()).to(equal, 'bar');
         });
       });
@@ -223,7 +223,7 @@ Screw.Unit(function() {
         }
 
         before(function() {
-          view = Disco.View.build(template);
+          view = Disco.build(template);
         });
 
         it("returns a view wrapping the HTML specified in the template's content method", function() {
@@ -269,14 +269,14 @@ Screw.Unit(function() {
         });
         
         it("assigns the attributes on the view before after_initialize is called", function() {
-          var view = Disco.View.build(template, variables);
+          var view = Disco.build(template, variables);
           expect(view.foo).to(equal, variables.foo);
           expect(view.baz).to(equal, variables.baz);
           expect(variables_at_time_of_call).to(equal, variables);
         });
 
         it('passes the attributes as arguments to the content template', function() {
-          var view = Disco.View.build(template, variables);
+          var view = Disco.build(template, variables);
           expect(view.html()).to(equal, 'bar');
         });
       })
@@ -329,7 +329,7 @@ Screw.Unit(function() {
         before(function() {
           initialization_order = [];
           initial_attributes_of_template_1_during_after_intialize = {};
-          view = Disco.View.build(function(builder) {
+          view = Disco.build(function(builder) {
             with(builder) {
               div({'class': "foo"}, function() {
                 subview('subview', template_1, { bar: "baz", bing: "bop" });
@@ -373,7 +373,7 @@ Screw.Unit(function() {
       describe("within a view that wraps multiple elements", function() {
         before(function() {
           initialization_order = [];
-          view = Disco.View.build(function(builder) {
+          view = Disco.build(function(builder) {
             with(builder) {
               div({'class': "sibling"}, function() {
                 div(function() {
@@ -441,7 +441,7 @@ Screw.Unit(function() {
         before(function() {
           initialization_order = [];
           initial_attributes_of_template_1_during_after_intialize = {};
-          view = Disco.View.build(function(builder) {
+          view = Disco.build(function(builder) {
             with(builder) {
               div({'class': "foo"}, function() {
                 keyed_subview('subviews', 1, template_1, { bar: "baz", bing: "bop" });

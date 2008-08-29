@@ -24,26 +24,26 @@ Screw.Unit(function() {
       describe('when the second argument is a hash', function() {
         describe('when the namespace is not yet registered', function() {
           before(function() {
-            expect(Disco.namespaces['So::So']).to(equal, undefined);
+            expect(Disco.Namespace.namespaces['So::So']).to(equal, undefined);
           });
           
           it('inserts the hash into the namespace store', function() {
             Disco.Namespace('So::So', { canned: 'corn' });
-            expect(Disco.namespaces['So::So']).to(equal, { canned: 'corn' });
+            expect(Disco.Namespace.namespaces['So::So']).to(equal, { canned: 'corn' });
           });
         });
         
         describe('when the namespace is already registered', function() {
           before(function() {
-            expect(Disco.namespaces['La::La']).to(equal, { canned: 'peaches' });
+            expect(Disco.Namespace.namespaces['La::La']).to(equal, { canned: 'peaches' });
           });
 
           it('merges the hash with the already registered hash', function() {
             Disco.Namespace('La::La', { pickled: 'ginger' });
-            expect(Disco.namespaces['La::La']).to(equal, { canned: 'peaches', pickled: 'ginger' });
+            expect(Disco.Namespace.namespaces['La::La']).to(equal, { canned: 'peaches', pickled: 'ginger' });
 
             Disco.Namespace('La::La', { canned: 'beans' });
-            expect(Disco.namespaces['La::La']).to(equal, { canned: 'beans', pickled: 'ginger' });
+            expect(Disco.Namespace.namespaces['La::La']).to(equal, { canned: 'beans', pickled: 'ginger' });
           });
         });
       });
