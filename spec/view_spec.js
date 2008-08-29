@@ -1,5 +1,3 @@
-//require("/specs/spec_helper");
-
 Screw.Unit(function() {
   describe("Disco", function() {
     var builder;
