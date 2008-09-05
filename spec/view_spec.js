@@ -151,7 +151,25 @@ Screw.Unit(function() {
           var view = Disco.build(merged_template);
           expect(after_initialize_calls).to(equal, [[view, 'layout'], [view, 'template']]);
         });
-      })
+        
+        var it_does_not_raise_for_undefined = function(missing_definition) {
+          describe("when " + missing_definition + " is undefined", function() {
+            before(function() {
+              delete eval(missing_definition);
+              merged_template = Disco.inherit(layout, template);
+            });
+
+            it("does not raise an exception", function() {
+              expect(raises_exception(function() { Disco.build(merged_template); })).to(equal, false);
+            });
+          });
+        };
+        
+        it_does_not_raise_for_undefined('layout.methods');
+        it_does_not_raise_for_undefined('layout.methods.after_initialize');
+        it_does_not_raise_for_undefined('template.methods');
+        it_does_not_raise_for_undefined('template.methods.after_initialize');
+      });
     });
 
     describe(".build", function() {
