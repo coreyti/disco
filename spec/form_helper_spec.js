@@ -12,8 +12,8 @@ Screw.Unit(function() {
     }
     
     before(function() {
-      orig_url_helper = UrlHelper;
-      UrlHelper = {
+      orig_url_helper = Disco.UrlHelper;
+      Disco.UrlHelper = {
         models_path: function(model) {
           if(model && model.id) {
             return '/models/' + model.id;
@@ -24,7 +24,7 @@ Screw.Unit(function() {
     });
     
     after(function() {
-      UrlHelper = orig_url_helper;
+      Disco.UrlHelper = orig_url_helper;
     });
     
     describe("when used to extend a Disco builder", function() {
