@@ -170,6 +170,78 @@ Screw.Unit(function() {
         it_does_not_raise_for_undefined('template.methods');
         it_does_not_raise_for_undefined('template.methods.after_initialize');
       });
+      
+      describe("when applied to a subview", function() {
+        var view, form_builder, parent_builder, child_builder;
+        
+        before(function() {
+          form_builder = {
+            form_for: function(fn) {
+              return this.tag_with_array_args('form', [{action: '/foo'}, fn]);
+            },
+            
+            input_for: function(attribute) {
+              return this.tag_with_array_args('input', [{name: attribute, value: ''}]);
+            }
+          };
+          
+          form_layout = {
+            content: function(builder) {
+              var self = this;
+              var extended_builder = $.extend(true, {}, builder, form_builder);
+              
+              with(extended_builder) {
+                form_for(function() {
+                  self.form_content(extended_builder);
+                });
+              }
+
+
+              // get here...
+              // with(builder) {
+              //   form_for(function() {
+              //     this.form_content(builder);
+              //   });
+              // }
+            }
+          };
+          
+          page_template = {
+            content: function(builder) {
+              parent_builder = builder;
+              with(builder) {
+                div(function() {
+                  subview('form', form_template);
+                });
+              }
+            }
+          };
+          
+          child_template = {
+            form_content: function(builder) {
+              child_builder = builder;
+              with(builder) {
+                input_for('name');
+              }
+            }
+          };
+          
+          form_template = Disco.inherit(form_layout, child_template);
+          view = Disco.build(page_template);
+        });
+      
+        describe("the builder for parent view", function() {
+          it("does not inherit the layout", function() {
+            expect(parent_builder.input_for).to(equal, undefined);
+          });
+        });
+        
+        describe("the builder for child view", function() {
+          it("inherits the layout", function() {
+            expect(child_builder.input_for).to(equal, form_builder.input_for);
+          });
+        });
+      });
     });
 
     describe(".build", function() {
