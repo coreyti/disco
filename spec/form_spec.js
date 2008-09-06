@@ -19,6 +19,36 @@ Screw.Unit(function() {
       });
     };
     
+    describe("#label_for", function() {
+      describe("when passed a model attribute name", function() {
+        before_helper('label[for=model_name]', function(builder) {
+          with(builder) {
+            label_for('name');
+          }
+        });
+      
+        describe("the emitted label tag", function() {
+          it("has @for composed of model name and attribute name", function() {
+            expect(element.attr('for')).to(equal, 'model_name');
+          });
+        });
+      });
+
+      describe("when passed a model attribute name and html_attributes", function() {
+        before_helper('label[for=model_name]', function(builder) {
+          with(builder) {
+            label_for('name', { 'class': 'custom_class' });
+          }
+        });
+        
+        describe("the emitted label tag", function() {
+          it("includes the given html_attributes", function() {
+            expect(element.attr('class')).to(equal, 'custom_class');
+          });
+        });
+      });
+    });
+    
     describe("#input_for", function() {
       describe("when passed a model attribute name", function() {
         before_helper('input#model_name', function(builder) {
