@@ -7,160 +7,197 @@ Screw.Unit(function() {
     });
     
     describe("helpers", function() {
-      var before_helper = function(selector, fn) {
-        before(function() {
-          template = Disco.inherit(Disco.Form, {
-            form_content: function(builder, initial_attributes) {
-              with(builder) {
-                fn(builder);
+      describe("when the configuration includes constructor_name", function() {
+        var before_helper = function(selector, fn) {
+          before(function() {
+            template = Disco.inherit(Disco.Form, {
+              form_content: function(builder, initial_attributes) {
+                with(builder) {
+                  fn(builder);
+                }
+              },
+
+              configuration: {
+                constructor_name: 'Animal'
               }
-            },
+            });
 
-            configuration: {
-              model_type: 'Animal'
-            }
+            view = Disco.build(template, { model: model });
+            element = view.find(selector);
+          });
+        };
+
+        describe("#label_for", function() {
+          describe("when passed a model attribute name", function() {
+            before_helper('label[for=animal_name]', function(builder) {
+              with(builder) {
+                label_for('name');
+              }
+            });
+
+            describe("the emitted label tag", function() {
+              it("has @for composed of model name and attribute name", function() {
+                expect(element.attr('for')).to(equal, 'animal_name');
+              });
+            });
           });
 
-          view = Disco.build(template, { model: model });
-          element = view.find(selector);
-        });
-      };
+          describe("when passed a model attribute name and html_attributes", function() {
+            before_helper('label[for=animal_name]', function(builder) {
+              with(builder) {
+                label_for('name', { 'class': 'custom_class' });
+              }
+            });
 
-      describe("#label_for", function() {
-        describe("when passed a model attribute name", function() {
-          before_helper('label[for=model_name]', function(builder) {
-            with(builder) {
-              label_for('name');
-            }
-          });
-
-          describe("the emitted label tag", function() {
-            it("has @for composed of model name and attribute name", function() {
-              expect(element.attr('for')).to(equal, 'model_name');
+            describe("the emitted label tag", function() {
+              it("includes the given html_attributes", function() {
+                expect(element.attr('class')).to(equal, 'custom_class');
+              });
             });
           });
         });
 
-        describe("when passed a model attribute name and html_attributes", function() {
-          before_helper('label[for=model_name]', function(builder) {
-            with(builder) {
-              label_for('name', { 'class': 'custom_class' });
-            }
+        describe("#input_for", function() {
+          describe("when passed a model attribute name", function() {
+            before_helper('input#animal_name', function(builder) {
+              with(builder) {
+                input_for('name');
+              }
+            });
+
+            describe("the emitted input tag", function() {
+              it("has @id composed of model name and attribute name", function() {
+                expect(element.attr('id')).to(equal, 'animal_name');
+              });
+
+              it("has @name composed of model name and attribute name", function() {
+                expect(element.attr('name')).to(equal, 'animal[name]');
+              });
+
+              it("has @type defaulted to 'text", function() {
+                expect(element.attr('type')).to(equal, 'text');
+              });
+            });
           });
 
-          describe("the emitted label tag", function() {
-            it("includes the given html_attributes", function() {
-              expect(element.attr('class')).to(equal, 'custom_class');
+          describe("when passed a model attribute name and html_attributes", function() {
+            before_helper('input#animal_name', function(builder) {
+              with(builder) {
+                input_for('name', { 'type': 'hidden', 'class': 'custom_class' });
+              }
+            });
+
+            describe("the emitted input tag", function() {
+              it("includes the given html_attributes", function() {
+                expect(element.attr('type')).to(equal, 'hidden');
+                expect(element.attr('class')).to(equal, 'custom_class');
+              });
+            });
+          });
+        });
+
+        describe("#select_for", function() {
+          describe("when passed a model attribute name", function() {
+            before_helper('select#animal_type', function(builder) { 
+              with(builder) {
+                select_for('type');
+              }
+            });
+
+            describe("the emitted select tag", function() {
+              it("has @id composed of model name and attribute name", function() {
+                expect(element.length).to(equal, 1);
+                expect(element.attr('id')).to(equal, 'animal_type');
+              });
+
+              it("has @name composed of model name and attribute name", function() {
+                expect(element.length).to(equal, 1);
+                expect(element.attr('name')).to(equal, 'animal[type]');
+              });
+            });
+          });
+
+          describe("when passed a model attribute name and html_attributes", function() {
+            before_helper('select#animal_type', function(builder) { 
+              with(builder) {
+                select_for('type', {'class': 'custom_class'});
+              }
+            });
+
+            describe("the emitted select tag", function() {
+              it("includes the given html_attributes", function() {
+                expect(element.attr('class')).to(equal, 'custom_class');
+              });
+            });
+          });
+
+          describe("when passed a model attribute name and a function", function() {
+            before_helper('select#animal_type', function(builder) { 
+              with(builder) {
+                select_for('type', function() {
+                  option('Elephant');
+                  option('Donkey');
+                });
+              }
+            });
+
+            describe("the emitted select tag", function() {
+              it("invokes the function to generate option elements", function() {
+                expect(element.find('option').length).to(equal, 2);
+              });
+            });
+          });
+
+          describe("when passed a model attribute name, html_attributes and a function", function() {
+            before_helper('select#animal_type', function(builder) { 
+              with(builder) {
+                select_for('type', {'class': 'custom_class'}, function() {
+                  option('Elephant');
+                });
+              }
+            });
+
+            describe("the emitted select tag", function() {
+              it("includes the given html_attributes and invokes the function to generate option elements", function() {
+                expect(element.attr('class')).to(equal, 'custom_class');
+                expect(element.find('option').length).to(equal, 1);
+              });
             });
           });
         });
       });
+      
+      describe("when the configuration excludes constructor_name (or there is no configuration)", function() {
+        var before_helper = function(selector, fn) {
+          before(function() {
+            template = Disco.inherit(Disco.Form, {
+              form_content: function(builder, initial_attributes) {
+                with(builder) {
+                  fn(builder);
+                }
+              }
+            });
 
-      describe("#input_for", function() {
-        describe("when passed a model attribute name", function() {
-          before_helper('input#model_name', function(builder) {
-            with(builder) {
-              input_for('name');
-            }
+            view = Disco.build(template, { model: model });
+            element = view.find(selector);
           });
+        };
 
-          describe("the emitted input tag", function() {
-            it("has @id composed of model name and attribute name", function() {
-              expect(element.attr('id')).to(equal, 'model_name');
-            });
+        before_helper('input#model_name', function(builder) {
+          with(builder) {
+            input_for('name');
+          }
+        });
 
-            it("has @name composed of model name and attribute name", function() {
-              expect(element.attr('name')).to(equal, 'model[name]');
-            });
-
-            it("has @type defaulted to 'text", function() {
-              expect(element.attr('type')).to(equal, 'text');
-            });
+        describe("@id", function() {
+          it("defaults to be prefixed with 'model'", function() {
+            expect(element.attr('id')).to(equal, 'model_name');
           });
         });
 
-        describe("when passed a model attribute name and html_attributes", function() {
-          before_helper('input#model_name', function(builder) {
-            with(builder) {
-              input_for('name', { 'type': 'hidden', 'class': 'custom_class' });
-            }
-          });
-
-          describe("the emitted input tag", function() {
-            it("includes the given html_attributes", function() {
-              expect(element.attr('type')).to(equal, 'hidden');
-              expect(element.attr('class')).to(equal, 'custom_class');
-            });
-          });
-        });
-      });
-
-      describe("#select_for", function() {
-        describe("when passed a model attribute name", function() {
-          before_helper('select#model_type', function(builder) { 
-            with(builder) {
-              select_for('type');
-            }
-          });
-
-          describe("the emitted select tag", function() {
-            it("has @id composed of model name and attribute name", function() {
-              expect(element.length).to(equal, 1);
-              expect(element.attr('id')).to(equal, 'model_type');
-            });
-
-            it("has @name composed of model name and attribute name", function() {
-              expect(element.length).to(equal, 1);
-              expect(element.attr('name')).to(equal, 'model[type]');
-            });
-          });
-        });
-
-        describe("when passed a model attribute name and html_attributes", function() {
-          before_helper('select#model_type', function(builder) { 
-            with(builder) {
-              select_for('type', {'class': 'custom_class'});
-            }
-          });
-
-          describe("the emitted select tag", function() {
-            it("includes the given html_attributes", function() {
-              expect(element.attr('class')).to(equal, 'custom_class');
-            });
-          });
-        });
-
-        describe("when passed a model attribute name and a function", function() {
-          before_helper('select#model_type', function(builder) { 
-            with(builder) {
-              select_for('type', function() {
-                option('Elephant');
-                option('Donkey');
-              });
-            }
-          });
-
-          describe("the emitted select tag", function() {
-            it("invokes the function to generate option elements", function() {
-              expect(element.find('option').length).to(equal, 2);
-            });
-          });
-        });
-
-        describe("when passed a model attribute name, html_attributes and a function", function() {
-          before_helper('select#model_type', function(builder) { 
-            with(builder) {
-              select_for('type', {'class': 'custom_class'}, function() {
-                option('Elephant');
-              });
-            }
-          });
-
-          describe("the emitted select tag", function() {
-            it("includes the given html_attributes and invokes the function to generate option elements", function() {
-              expect(element.attr('class')).to(equal, 'custom_class');
-              expect(element.find('option').length).to(equal, 1);
-            });
+        describe("@name", function() {
+          it("defaults to be prefixed with 'model'", function() {
+            expect(element.attr('name')).to(equal, 'model[name]');
           });
         });
       });
@@ -177,7 +214,7 @@ Screw.Unit(function() {
             },
 
             configuration: {
-              model_type: 'Animal'
+              constructor_name: 'Animal'
             }
           });
 
@@ -194,7 +231,7 @@ Screw.Unit(function() {
 
       describe("#after_initialize", function() {
         describe("when initial_attributes includes a model", function() {
-          before_helper(true, 'input#model_name', function(builder) {
+          before_helper(true, 'input#animal_name', function(builder) {
             with(builder) {
               input_for('name');
             }
@@ -206,7 +243,7 @@ Screw.Unit(function() {
         });
         
         describe("when initial_attributes excludes a model", function() {
-          before_helper(false, 'input#model_name', function(builder) {
+          before_helper(false, 'input#animal_name', function(builder) {
             with(builder) {
               input_for('name');
             }
@@ -223,7 +260,7 @@ Screw.Unit(function() {
       describe("#load", function() {
         describe("#input_for", function() {
           describe("when the model's attribute has a value", function() {
-            before_helper(false, 'input#model_name', function(builder) {
+            before_helper(false, 'input#animal_name', function(builder) {
               with(builder) {
                 input_for('name');
               }
@@ -237,7 +274,7 @@ Screw.Unit(function() {
           });
 
           describe("when the model's attribute does not have a value", function() {
-            before_helper(false, 'input#model_mood', function(builder) {
+            before_helper(false, 'input#animal_mood', function(builder) {
               with(builder) {
                 input_for('mood');
               }
@@ -253,7 +290,7 @@ Screw.Unit(function() {
 
         describe("#select_for", function() {
           describe("when the model's attribute has a value", function() {
-            before_helper(false, 'select#model_number', function(builder) { 
+            before_helper(false, 'select#animal_number', function(builder) { 
               with(builder) {
                 select_for('number', function() {
                   option('one');
@@ -274,7 +311,7 @@ Screw.Unit(function() {
           });
 
           describe("when the model's attribute does not have a value", function() {
-            before_helper(false, 'select#model_color', function(builder) { 
+            before_helper(false, 'select#animal_color', function(builder) { 
               with(builder) {
                 select_for('color', function() {
                   option('red');
@@ -295,7 +332,7 @@ Screw.Unit(function() {
 
       describe("#save", function() {
         describe("#input_for", function() {
-          before_helper(false, 'input#model_name', function(builder) {
+          before_helper(false, 'input#animal_name', function(builder) {
             with(builder) {
               input_for('name');
             }
@@ -311,7 +348,7 @@ Screw.Unit(function() {
         });
 
         describe("#select_for", function() {
-          before_helper(false, 'select#model_number', function(builder) {
+          before_helper(false, 'select#animal_number', function(builder) {
             with(builder) {
               select_for('number', function() {
                 option('one');
