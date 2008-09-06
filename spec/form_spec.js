@@ -215,8 +215,25 @@ Screw.Unit(function() {
       });
       
       describe("when #save is called on the view", function() {
+        before_helper('select#model_number', function(builder) {
+          with(builder) {
+            select_for('number', function() {
+              option('one');
+              option('two');
+            });
+          }
+        });
+
+        before(function() {
+          model.number = 'one'
+        });
+
         it("stores the selected option in the view's #model", function() {
-          
+          var new_number = "two";
+          element.val(new_number);
+          expect(model.number).to(equal, "one");
+          view.save();
+          expect(model.number).to(equal, new_number);
         });
       });
     });
