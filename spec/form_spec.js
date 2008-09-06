@@ -20,62 +20,69 @@ Screw.Unit(function() {
     };
     
     describe("#input_for", function() {
+      describe("when passed a model attribute name", function() {
+        before_helper('input#model_name', function(builder) {
+          with(builder) {
+            input_for('name');
+          }
+        });
+
+        describe("the emitted input tag", function() {
+          it("has @id composed of model name and attribute name", function() {
+            expect(element.attr('id')).to(equal, 'model_name');
+          });
+
+          it("has @name composed of model name and attribute name", function() {
+            expect(element.attr('name')).to(equal, 'model[name]');
+          });
+
+          it("has @type defaulted to 'text", function() {
+            expect(element.attr('type')).to(equal, 'text');
+          });
+        });
+      });
+
+      describe("when passed a model attribute name and html_attributes", function() {
+        before_helper('input#model_name', function(builder) {
+          with(builder) {
+            input_for('name', { 'type': 'hidden', 'class': 'custom_class' });
+          }
+        });
+        
+        describe("the emitted input tag", function() {
+          it("includes the given html_attributes", function() {
+            expect(element.attr('type')).to(equal, 'hidden');
+            expect(element.attr('class')).to(equal, 'custom_class');
+          });
+        });
+      });
+
       describe("when #load is called on the view", function() {
-        describe("when passed a model attribute name", function() {
+        describe("when the model's attribute has a value", function() {
           before_helper('input#model_name', function(builder) {
             with(builder) {
               input_for('name');
             }
           });
 
-          describe("the emitted input tag", function() {
-            it("populates input elements in the form based on attribute values in the #model", function() {
-              expect(element.length).to(equal, 1);
-              expect(element.val()).to(equal, "");
-              view.load();
-              expect(element.val()).to(equal, 'Dumbo');
-            });
-
-            it("has @id composed of model name and attribute name", function() {
-              expect(element.attr('id')).to(equal, 'model_name');
-            });
-
-            it("has @name composed of model name and attribute name", function() {
-              expect(element.attr('name')).to(equal, 'model[name]');
-            });
-
-            it("has @type defaulted to 'text", function() {
-              expect(element.attr('type')).to(equal, 'text');
-            });
-
-            describe("when the model does not have a value for the attribute", function() {
-              before_helper('input#model_mood', function(builder) {
-                with(builder) {
-                  input_for('mood');
-                }
-              });
-
-              it("has @value of empty string", function() {
-                expect(element.val()).to(equal, "");
-                view.load();
-                expect(element.val()).to(equal, "");
-              });
-            });
+          it("sets the input@value with the value of the model's attribute", function() {
+            expect(element.val()).to(equal, "");
+            view.load();
+            expect(element.val()).to(equal, 'Dumbo');
           });
         });
-
-        describe("when passed a model attribute name and html_attributes", function() {
-          before_helper('input#model_name', function(builder) {
+        
+        describe("when the model's attribute does not have a value", function() {
+          before_helper('input#model_mood', function(builder) {
             with(builder) {
-              input_for('name', { 'type': 'hidden', 'class': 'custom_class' });
+              input_for('mood');
             }
           });
-          
-          describe("the emitted input tag", function() {
-            it("includes the given html_attributes", function() {
-              expect(element.attr('type')).to(equal, 'hidden');
-              expect(element.attr('class')).to(equal, 'custom_class');
-            });
+
+          it("sets the input@value to empty string", function() {
+            expect(element.val()).to(equal, "");
+            view.load();
+            expect(element.val()).to(equal, "");
           });
         });
       });
@@ -98,72 +105,111 @@ Screw.Unit(function() {
     });
     
     describe("#select_for", function() {
+      describe("when passed a model attribute name", function() {
+        before_helper('select#model_type', function(builder) { 
+          with(builder) {
+            select_for('type');
+          }
+        });
+
+        describe("the emitted select tag", function() {
+          it("has @id composed of model name and attribute name", function() {
+            expect(element.length).to(equal, 1);
+            expect(element.attr('id')).to(equal, 'model_type');
+          });
+
+          it("has @name composed of model name and attribute name", function() {
+            expect(element.length).to(equal, 1);
+            expect(element.attr('name')).to(equal, 'model[type]');
+          });
+        });
+      });
+
+      describe("when passed a model attribute name and a function", function() {
+        before_helper('select#model_type', function(builder) { 
+          with(builder) {
+            select_for('type', function() {
+              option('Elephant');
+              option('Donkey');
+            });
+          }
+        });
+
+        describe("the emitted select tag", function() {
+          it("invokes the function to generate option elements", function() {
+            expect(element.find('option').length).to(equal, 2);
+          });
+        });
+      });
+
+      describe("when passed a model attribute name and html_attributes", function() {
+        before_helper('select#model_type', function(builder) { 
+          with(builder) {
+            select_for('type', {'class': 'custom_class'});
+          }
+        });
+
+        describe("the emitted select tag", function() {
+          it("includes the given html_attributes", function() {
+            expect(element.attr('class')).to(equal, 'custom_class');
+          });
+        });
+      });
+
+      describe("when passed a model attribute name, html_attributes and a function", function() {
+        before_helper('select#model_type', function(builder) { 
+          with(builder) {
+            select_for('type', {'class': 'custom_class'}, function() {
+              option('Elephant');
+            });
+          }
+        });
+
+        describe("the emitted select tag", function() {
+          it("includes the given html_attributes and invokes the function to generate option elements", function() {
+            expect(element.attr('class')).to(equal, 'custom_class');
+            expect(element.find('option').length).to(equal, 1);
+          });
+        });
+      });
+
       describe("when #load is called on the view", function() {
-        describe("when passed a model attribute name", function() {
-          before_helper('select#model_type', function(builder) { 
+        describe("when the model's attribute has a value", function() {
+          before_helper('select#model_number', function(builder) { 
             with(builder) {
-              select_for('type');
-            }
-          });
-
-          describe("the emitted select tag", function() {
-            it("has @id composed of model name and attribute name", function() {
-              expect(element.length).to(equal, 1);
-              expect(element.attr('id')).to(equal, 'model_type');
-            });
-
-            it("has @name composed of model name and attribute name", function() {
-              expect(element.length).to(equal, 1);
-              expect(element.attr('name')).to(equal, 'model[type]');
-            });
-          });
-        });
-
-        describe("when passed a model attribute name and a function", function() {
-          before_helper('select#model_type', function(builder) { 
-            with(builder) {
-              select_for('type', function() {
-                option('Elephant');
-                option('Donkey');
+              select_for('number', function() {
+                option('one');
+                option('two');
               });
             }
           });
 
-          describe("the emitted select tag", function() {
-            it("invokes the function to generate option elements", function() {
-              expect(element.find('option').length).to(equal, 2);
-            });
+          before(function() {
+            model.number = 'two'
+          });
+
+          it("selects the option matching the model's attribute value", function() {
+            expect(element.val()).to(equal, 'one');
+            view.load();
+            expect(element.val()).to(equal, 'two');
           });
         });
-
-        describe("when passed a model attribute name and html_attributes", function() {
-          before_helper('select#model_type', function(builder) { 
+        
+        describe("when the model's attribute does not have a value", function() {
+          before_helper('select#model_color', function(builder) { 
             with(builder) {
-              select_for('type', {'class': 'custom_class'});
-            }
-          });
-
-          describe("the emitted select tag", function() {
-            it("includes the given html_attributes", function() {
-              expect(element.attr('class')).to(equal, 'custom_class');
-            });
-          });
-        });
-
-        describe("when passed a model attribute name, html_attributes and a function", function() {
-          before_helper('select#model_type', function(builder) { 
-            with(builder) {
-              select_for('type', {'class': 'custom_class'}, function() {
-                option('Elephant');
+              select_for('color', function() {
+                option('red');
+                option('orange');
+                option('yellow');
               });
             }
           });
 
-          describe("the emitted select tag", function() {
-            it("includes the given html_attributes and invokes the function to generate option elements", function() {
-              expect(element.attr('class')).to(equal, 'custom_class');
-              expect(element.find('option').length).to(equal, 1);
-            });
+          it("selects the first option", function() {
+            expect(element.val()).to(equal, 'red');
+            view.load();
+            expect(element.val()).to(equal, 'red');
           });
         });
       });
