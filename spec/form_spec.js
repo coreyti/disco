@@ -165,6 +165,61 @@ Screw.Unit(function() {
             });
           });
         });
+
+        describe("#action_button", function() {
+          describe("when passed the button text and action", function() {
+            var original_action;
+            var called = false;
+            
+            before_helper('input#animal_button_save', function(builder) {
+              with(builder) {
+                action_button('Save animal', 'save')
+              }
+            });
+
+            before(function() {
+              original_action = view.save;
+              view.save = function() {
+                called = true;
+              };
+            });
+            
+            after(function() {
+              view.save = original_action;
+            });
+
+            describe("the emitted input[@type=button] tag", function() {
+              it("has @id composed of model name and the action", function() {
+                expect(element.length).to(equal, 1);
+                expect(element.attr('id')).to(equal, 'animal_button_save');
+              });
+
+              it("has @name composed of model name and action", function() {
+                expect(element.length).to(equal, 1);
+                expect(element.attr('name')).to(equal, 'animal[button][save]');
+              });
+              
+              it("when clicked, executes the associated action", function() {
+                element.click();
+                expect(called).to(equal, true);
+              });
+            });
+          });
+
+          describe("when passed the button text, action, and html_attributes", function() {
+            before_helper('input#animal_button_save', function(builder) {
+              with(builder) {
+                action_button('Save animal', 'save', {class: 'custom_class'})
+              }
+            });
+
+            describe("the emitted input[@type=button] tag", function() {
+              it("includes the given html_attributes", function() {
+                expect(element.attr('class')).to(equal, 'custom_class');
+              });
+            });
+          });
+        });
       });
       
       describe("when the configuration excludes constructor_name (or there is no configuration)", function() {
@@ -331,6 +386,68 @@ Screw.Unit(function() {
       });
 
       describe("#save", function() {
+        describe("when the form has no form fields", function() {
+          before_helper(false, 'input#animal_button_save', function() {});
+          
+          it("successfully saves the form", function() {
+            var raised = false;
+            try {
+              view.save();
+            }
+            catch(ex) {
+              raised = true;
+            }
+            expect(raised).to(equal, false);
+          });
+        });
+        
+        describe("callbacks", function() {
+          var action_callback = function() {
+            element.val('Sherekahn');
+          };
+
+          var before_helper = function(selector, callbacks) {
+            before(function() {
+              template = Disco.inherit(Disco.Form, {
+                form_content: function(builder, initial_attributes) {
+                  with(builder) {
+                    input_for('name');
+                  }
+                },
+
+                configuration: {
+                  constructor_name: 'Animal'
+                }
+              });
+
+              view = Disco.build(template, $.extend({ model: model }, callbacks));
+              element = view.find(selector);
+            });
+          };
+
+          describe("#before_save", function() {
+            before_helper('input#animal_name', {before_save: action_callback});
+            
+            it("fires the before callback, before save", function() {
+              expect(model.name).to(equal, 'Dumbo');
+              view.save();
+              expect(element.val()).to(equal, 'Sherekahn');
+              expect(model.name).to(equal, 'Sherekahn')
+            });
+          });
+          
+          describe("#after_save", function() {
+            before_helper('input#animal_name', {after_save: action_callback});
+            
+            it("fires the after callback, after save", function() {
+              expect(model.name).to(equal, 'Dumbo');
+              view.save();
+              expect(element.val()).to(equal, 'Sherekahn');
+              expect(model.name).to(equal, 'Dumbo')
+            });
+          });
+        });
+        
         describe("#input_for", function() {
           before_helper(false, 'input#animal_name', function(builder) {
             with(builder) {
