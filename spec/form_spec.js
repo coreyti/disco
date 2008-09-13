@@ -195,10 +195,17 @@ Screw.Unit(function() {
               });
 
               it("has @name composed of model name and action", function() {
-                expect(element.length).to(equal, 1);
                 expect(element.attr('name')).to(equal, 'animal[button][save]');
               });
               
+              it("has @type equal to 'button'", function() {
+                expect(element.attr('type')).to(equal, 'button');
+              });
+              
+              it("has @value equal to the text", function() {
+                expect(element.attr('value')).to(equal, 'Save animal');
+              });
+
               it("when clicked, executes the associated action", function() {
                 element.click();
                 expect(called).to(equal, true);
