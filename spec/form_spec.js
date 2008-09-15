@@ -27,6 +27,32 @@ Screw.Unit(function() {
           });
         };
 
+        describe("#messages_for", function() {
+          describe("when passed a model attribute name", function() {
+            before(function() {
+              model.errors = {'name': "can't be Dumbo", 'type': "can't be blank"};
+            });
+
+            before_helper('ul#animal_errors', function(builder) {
+              with(builder) {
+                messages_for('errors');
+                input_for('name');
+                input_for('type');
+              }
+            });
+            
+            describe("the emitted ul tag", function() {
+              it("has @id composed of model name and attribute name", function() {
+                expect(element.attr('id')).to(equal, 'animal_errors');
+              });
+              
+              it("has @class equal to 'messages' + the attribute name", function() {
+                expect(element.attr('class')).to(equal, 'messages errors');
+              });
+            });
+          });
+        });
+
         describe("#label_for", function() {
           describe("when passed a model attribute name", function() {
             before_helper('label[for=animal_name]', function(builder) {
@@ -320,6 +346,38 @@ Screw.Unit(function() {
       });
       
       describe("#load", function() {
+        describe("#messages_for", function() {
+          describe("when the model has a matching attribute", function() {
+            before(function() {
+              model.errors = {'type': "can't be blank", 'name': "can't be Dumbo"};
+            });
+
+            before_helper(true, 'ul#animal_errors', function(builder) {
+              with(builder) {
+                messages_for('errors');
+                input_for('name');
+                input_for('type');
+              }
+            });
+            
+            describe("the messages ul", function() {
+              it("receives an li tag for each message, ordered by field appearance", function() {
+                var items = element.find('li');
+                expect(items.length).to(equal, 2);
+                expect(items.eq(0).html()).to(equal, "Name can't be Dumbo");
+                expect(items.eq(1).html()).to(equal, "Type can't be blank");
+              });
+            });
+            
+            describe("each form field associated with a message", function() {
+              it("receives a class with the message name", function() {
+                expect(view.find('input#animal_name').hasClass('error')).to(equal, true);
+                expect(view.find('input#animal_type').hasClass('error')).to(equal, true);
+              });
+            });
+          });
+        });
+
         describe("#input_for", function() {
           describe("when the model's attribute has a value", function() {
             before_helper(false, 'input#animal_name', function(builder) {
@@ -451,6 +509,45 @@ Screw.Unit(function() {
               view.save();
               expect(element.val()).to(equal, 'Sherekahn');
               expect(model.name).to(equal, 'Dumbo')
+            });
+          });
+        });
+        
+        describe("#messages_for", function() {
+          describe("when the model has a matching attribute", function() {
+            before(function() {
+              model.errors = {'name': "can't be Dumbo"};
+            });
+
+            before_helper(true, 'ul#animal_errors', function(builder) {
+              with(builder) {
+                messages_for('errors');
+                input_for('name');
+              }
+            });
+            
+            describe("the messages ul", function() {
+              it("is cleared of any messages", function() {
+                expect(element.find('li').length).to(equal, 1);
+                view.save();
+                expect(element.find('li').length).to(equal, 0);
+              });
+            });
+            
+            describe("each form field associated with a message", function() {
+              it("is cleared of any message class", function() {
+                expect(view.find('input#animal_name').hasClass('error')).to(equal, true);
+                view.save();
+                expect(view.find('input#animal_name').hasClass('error')).to(equal, false);
+              });
+            });
+            
+            describe("the model", function() {
+              it("is cleared of the message attribute", function() {
+                expect(model.errors).to_not(equal, undefined);
+                view.save();
+                expect(model.errors).to(equal, undefined);
+              });
             });
           });
         });

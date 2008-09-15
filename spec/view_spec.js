@@ -195,14 +195,6 @@ Screw.Unit(function() {
                   self.form_content(extended_builder);
                 });
               }
-
-
-              // get here...
-              // with(builder) {
-              //   form_for(function() {
-              //     this.form_content(builder);
-              //   });
-              // }
             }
           };
           
