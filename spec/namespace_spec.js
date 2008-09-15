@@ -60,7 +60,7 @@ Screw.Unit(function() {
           caught = e;
         }
         
-        expect(caught).to(equal, 'InvalidNamespaceException');
+        expect(caught).to(equal, 'InvalidNamespaceException for Chicken::Head');
       });
     });
   });
