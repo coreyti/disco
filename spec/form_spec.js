@@ -29,10 +29,6 @@ Screw.Unit(function() {
 
         describe("#messages_for", function() {
           describe("when passed a model attribute name", function() {
-            before(function() {
-              model.errors = {'name': "can't be Dumbo", 'type': "can't be blank"};
-            });
-
             before_helper('ul#animal_errors', function(builder) {
               with(builder) {
                 messages_for('errors');
@@ -48,6 +44,10 @@ Screw.Unit(function() {
               
               it("has @class equal to 'messages' + the attribute name", function() {
                 expect(element.attr('class')).to(equal, 'messages errors');
+              });
+              
+              it("is hidden", function() {
+                expect(view.find('ul#animal_errors:hidden').length).to(equal, 1);
               });
             });
           });
@@ -360,12 +360,22 @@ Screw.Unit(function() {
               }
             });
             
+            describe("the form", function() {
+              it("receives a class with the message name", function() {
+                expect(view.hasClass('error')).to(equal, true);
+              })
+            });
+            
             describe("the messages ul", function() {
               it("receives an li tag for each message, ordered by field appearance", function() {
                 var items = element.find('li');
                 expect(items.length).to(equal, 2);
                 expect(items.eq(0).html()).to(equal, "Name can't be Dumbo");
                 expect(items.eq(1).html()).to(equal, "Type can't be blank");
+              });
+              
+              it("is made visible", function() {
+                expect(view.find('ul#animal_errors:visible').length).to(equal, 1);
               });
             });
             
@@ -526,11 +536,27 @@ Screw.Unit(function() {
               }
             });
             
+            describe("the form", function() {
+              it("is cleared of message class", function() {
+                expect(view.hasClass('error')).to(equal, true);
+                view.save();
+                expect(view.hasClass('error')).to(equal, false);
+              });
+            });
+            
             describe("the messages ul", function() {
               it("is cleared of any messages", function() {
                 expect(element.find('li').length).to(equal, 1);
                 view.save();
                 expect(element.find('li').length).to(equal, 0);
+              });
+
+              it("is made hidden", function() {
+                expect(view.find('ul#animal_errors:hidden').length).to(equal, 0);
+                expect(view.find('ul#animal_errors:visible').length).to(equal, 1);
+                view.save();
+                expect(view.find('ul#animal_errors:hidden').length).to(equal, 1);
+                expect(view.find('ul#animal_errors:visible').length).to(equal, 0);
               });
             });
             
