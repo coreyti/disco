@@ -350,7 +350,7 @@ Screw.Unit(function() {
           var original_errors;
           
           before(function() {
-            model.errors = {'type': "can't be blank", 'name': "can't be Dumbo", 'foobar': "can't be bad"};
+            model.errors = {'type': "can't be blank", 'name': "can't be Dumbo", 'foobar': "you fool! foobar can't be bad!"};
 
             original_errors = {};
             $.each(model.errors, function(key, value) { original_errors[key] = value; });
@@ -385,7 +385,7 @@ Screw.Unit(function() {
             
             it("receives an li tag for each message that does not match a form field", function() {
               var items = element.find('li');
-              expect(items.eq(2).html()).to(equal, "Foobar can't be bad");
+              expect(items.eq(2).html()).to(equal, "you fool! foobar can't be bad!");
             });
             
             it("is made visible", function() {
