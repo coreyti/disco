@@ -332,6 +332,46 @@ Screw.Unit(function() {
       });
       
       describe("#load", function() {
+        describe("#before_load", function() {
+          var before_load_called;
+
+          var action_callback = function() {
+            before_load_called = true;
+          };
+          
+          before_helper_with_callbacks('input#animal_name', {before_load: action_callback});
+          
+          before(function() {
+            before_load_called = false;
+          });
+          
+          it("fires the #before_load callback before load", function() {
+            expect(before_load_called).to(equal, false);
+            view.load();
+            expect(before_load_called).to(equal, true);
+          });
+        });
+        
+        describe("#after_load", function() {
+          var after_load_called;
+
+          var action_callback = function() {
+            after_load_called = true;
+          };
+          
+          before_helper_with_callbacks('input#animal_name', {after_load: action_callback});
+          
+          before(function() {
+            after_load_called = false;
+          });
+          
+          it("fires the #after_load callback after load", function() {
+            expect(after_load_called).to(equal, false);
+            view.load();
+            expect(after_load_called).to(equal, true);
+          });
+        });
+        
         describe("#messages_for", function() {
           var original_errors;
           
