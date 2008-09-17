@@ -2,31 +2,57 @@ Screw.Unit(function() {
   describe("Disco.Form", function() {
     var view, model, element;
     
+    var common_before_helper = function(selector, fn, configuration_hash, preload, callbacks) {
+      before(function() {
+        template = Disco.inherit(Disco.Form, {
+          form_content: function(builder, initial_attributes) {
+            with(builder) {
+              fn(builder);
+            }
+          },
+
+          configuration: configuration_hash
+        });
+
+        if(preload) {
+          view = Disco.build(template, $.extend({ model: model }, callbacks));
+        }
+        else {
+          view = Disco.build(template);
+          view.model = model;
+        }
+        
+        element = view.find(selector);
+      });
+    };
+    
+    var before_helper = function(selector, fn) {
+      common_before_helper(selector, fn, { constructor_name: 'Animal' }, true, {});
+    };
+
+    var before_helper_without_preload = function(selector, fn) {
+      common_before_helper(selector, fn, { constructor_name: 'Animal' }, false, {});
+    };
+
+    var before_helper_without_configuration = function(selector, fn) {
+      common_before_helper(selector, fn, {}, true, {});
+    };
+
+    var before_helper_with_callbacks = function(selector, callbacks) {
+      var content_function = function(builder) {
+        with(builder) {
+          input_for('name');
+        }
+      };
+      common_before_helper(selector, content_function, { constructor_name: 'Animal' }, true, callbacks);
+    };
+
     before(function() {
       model = { name: 'Dumbo' };
     });
     
     describe("helpers", function() {
       describe("when the configuration includes constructor_name", function() {
-        var before_helper = function(selector, fn) {
-          before(function() {
-            template = Disco.inherit(Disco.Form, {
-              form_content: function(builder, initial_attributes) {
-                with(builder) {
-                  fn(builder);
-                }
-              },
-
-              configuration: {
-                constructor_name: 'Animal'
-              }
-            });
-
-            view = Disco.build(template, { model: model });
-            element = view.find(selector);
-          });
-        };
-
         describe("#messages_for", function() {
           describe("when passed a model attribute name", function() {
             before_helper('ul#animal_errors', function(builder) {
@@ -256,22 +282,7 @@ Screw.Unit(function() {
       });
       
       describe("when the configuration excludes constructor_name (or there is no configuration)", function() {
-        var before_helper = function(selector, fn) {
-          before(function() {
-            template = Disco.inherit(Disco.Form, {
-              form_content: function(builder, initial_attributes) {
-                with(builder) {
-                  fn(builder);
-                }
-              }
-            });
-
-            view = Disco.build(template, { model: model });
-            element = view.find(selector);
-          });
-        };
-
-        before_helper('input#model_name', function(builder) {
+        before_helper_without_configuration('input#model_name', function(builder) {
           with(builder) {
             input_for('name');
           }
@@ -292,34 +303,9 @@ Screw.Unit(function() {
     });
     
     describe("methods", function() {
-      var before_helper = function(preload, selector, fn) {
-        before(function() {
-          template = Disco.inherit(Disco.Form, {
-            form_content: function(builder, initial_attributes) {
-              with(builder) {
-                fn(builder);
-              }
-            },
-
-            configuration: {
-              constructor_name: 'Animal'
-            }
-          });
-
-          if(preload) {
-            view = Disco.build(template, { model: model });
-          }
-          else {
-            view = Disco.build(template);
-            view.model = model;
-          }
-          element = view.find(selector);
-        });
-      };
-
       describe("#after_initialize", function() {
         describe("when initial_attributes includes a model", function() {
-          before_helper(true, 'input#animal_name', function(builder) {
+          before_helper('input#animal_name', function(builder) {
             with(builder) {
               input_for('name');
             }
@@ -331,7 +317,7 @@ Screw.Unit(function() {
         });
         
         describe("when initial_attributes excludes a model", function() {
-          before_helper(false, 'input#animal_name', function(builder) {
+          before_helper_without_preload('input#animal_name', function(builder) {
             with(builder) {
               input_for('name');
             }
@@ -361,7 +347,7 @@ Screw.Unit(function() {
             expect(model.errors).to(equal, original_errors);
           });
 
-          before_helper(true, 'ul#animal_errors', function(builder) {
+          before_helper('ul#animal_errors', function(builder) {
             with(builder) {
               messages_for('errors');
               input_for('name');
@@ -403,7 +389,7 @@ Screw.Unit(function() {
 
         describe("#input_for", function() {
           describe("when the model's attribute has a value", function() {
-            before_helper(false, 'input#animal_name', function(builder) {
+            before_helper_without_preload('input#animal_name', function(builder) {
               with(builder) {
                 input_for('name');
               }
@@ -417,7 +403,7 @@ Screw.Unit(function() {
           });
 
           describe("when the model's attribute does not have a value", function() {
-            before_helper(false, 'input#animal_mood', function(builder) {
+            before_helper_without_preload('input#animal_mood', function(builder) {
               with(builder) {
                 input_for('mood');
               }
@@ -433,7 +419,7 @@ Screw.Unit(function() {
 
         describe("#select_for", function() {
           describe("when the model's attribute has a value", function() {
-            before_helper(false, 'select#animal_number', function(builder) { 
+            before_helper_without_preload('select#animal_number', function(builder) { 
               with(builder) {
                 select_for('number', function() {
                   option('one');
@@ -454,7 +440,7 @@ Screw.Unit(function() {
           });
 
           describe("when the model's attribute does not have a value", function() {
-            before_helper(false, 'select#animal_color', function(builder) { 
+            before_helper_without_preload('select#animal_color', function(builder) { 
               with(builder) {
                 select_for('color', function() {
                   option('red');
@@ -475,7 +461,7 @@ Screw.Unit(function() {
 
       describe("#save", function() {
         describe("when the form has no form fields", function() {
-          before_helper(false, 'input#animal_button_save', function() {});
+          before_helper_without_preload('input#animal_button_save', function() {});
           
           it("successfully saves the form", function() {
             var raised = false;
@@ -494,27 +480,8 @@ Screw.Unit(function() {
             element.val('Sherekahn');
           };
 
-          var before_helper = function(selector, callbacks) {
-            before(function() {
-              template = Disco.inherit(Disco.Form, {
-                form_content: function(builder, initial_attributes) {
-                  with(builder) {
-                    input_for('name');
-                  }
-                },
-
-                configuration: {
-                  constructor_name: 'Animal'
-                }
-              });
-
-              view = Disco.build(template, $.extend({ model: model }, callbacks));
-              element = view.find(selector);
-            });
-          };
-
           describe("#before_save", function() {
-            before_helper('input#animal_name', {before_save: action_callback});
+            before_helper_with_callbacks('input#animal_name', {before_save: action_callback});
             
             it("fires the before callback, before save", function() {
               expect(model.name).to(equal, 'Dumbo');
@@ -525,7 +492,7 @@ Screw.Unit(function() {
           });
           
           describe("#after_save", function() {
-            before_helper('input#animal_name', {after_save: action_callback});
+            before_helper_with_callbacks('input#animal_name', {after_save: action_callback});
             
             it("fires the after callback, after save", function() {
               expect(model.name).to(equal, 'Dumbo');
@@ -542,7 +509,7 @@ Screw.Unit(function() {
               model.errors = {'name': "can't be Dumbo"};
             });
 
-            before_helper(true, 'ul#animal_errors', function(builder) {
+            before_helper('ul#animal_errors', function(builder) {
               with(builder) {
                 messages_for('errors');
                 input_for('name');
@@ -592,7 +559,7 @@ Screw.Unit(function() {
         });
         
         describe("#input_for", function() {
-          before_helper(false, 'input#animal_name', function(builder) {
+          before_helper_without_preload('input#animal_name', function(builder) {
             with(builder) {
               input_for('name');
             }
@@ -608,7 +575,7 @@ Screw.Unit(function() {
         });
 
         describe("#select_for", function() {
-          before_helper(false, 'select#animal_number', function(builder) {
+          before_helper_without_preload('select#animal_number', function(builder) {
             with(builder) {
               select_for('number', function() {
                 option('one');
