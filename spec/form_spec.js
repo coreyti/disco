@@ -347,43 +347,56 @@ Screw.Unit(function() {
       
       describe("#load", function() {
         describe("#messages_for", function() {
-          describe("when the model has a matching attribute", function() {
-            before(function() {
-              model.errors = {'type': "can't be blank", 'name': "can't be Dumbo"};
-            });
+          var original_errors;
+          
+          before(function() {
+            model.errors = {'type': "can't be blank", 'name': "can't be Dumbo", 'foobar': "can't be bad"};
 
-            before_helper(true, 'ul#animal_errors', function(builder) {
-              with(builder) {
-                messages_for('errors');
-                input_for('name');
-                input_for('type');
-              }
+            original_errors = {};
+            $.each(model.errors, function(key, value) { original_errors[key] = value; });
+            expect(original_errors).to(equal, model.errors);
+          });
+
+          after(function() {
+            expect(model.errors).to(equal, original_errors);
+          });
+
+          before_helper(true, 'ul#animal_errors', function(builder) {
+            with(builder) {
+              messages_for('errors');
+              input_for('name');
+              input_for('type');
+            }
+          });
+          
+          describe("the form", function() {
+            it("receives a class with the message name", function() {
+              expect(view.hasClass('error')).to(equal, true);
+            })
+          });
+          
+          describe("the messages ul", function() {
+            it("receives an li tag for each message, ordered by field appearance", function() {
+              var items = element.find('li');
+              expect(items.length).to(equal, 3);
+              expect(items.eq(0).html()).to(equal, "Name can't be Dumbo");
+              expect(items.eq(1).html()).to(equal, "Type can't be blank");
             });
             
-            describe("the form", function() {
-              it("receives a class with the message name", function() {
-                expect(view.hasClass('error')).to(equal, true);
-              })
+            it("receives an li tag for each message that does not match a form field", function() {
+              var items = element.find('li');
+              expect(items.eq(2).html()).to(equal, "Foobar can't be bad");
             });
             
-            describe("the messages ul", function() {
-              it("receives an li tag for each message, ordered by field appearance", function() {
-                var items = element.find('li');
-                expect(items.length).to(equal, 2);
-                expect(items.eq(0).html()).to(equal, "Name can't be Dumbo");
-                expect(items.eq(1).html()).to(equal, "Type can't be blank");
-              });
-              
-              it("is made visible", function() {
-                expect(view.find('ul#animal_errors:visible').length).to(equal, 1);
-              });
+            it("is made visible", function() {
+              expect(view.find('ul#animal_errors:visible').length).to(equal, 1);
             });
-            
-            describe("each form field associated with a message", function() {
-              it("receives a class with the message name", function() {
-                expect(view.find('input#animal_name').hasClass('error')).to(equal, true);
-                expect(view.find('input#animal_type').hasClass('error')).to(equal, true);
-              });
+          });
+          
+          describe("each form field associated with a message", function() {
+            it("receives a class with the message name", function() {
+              expect(view.find('input#animal_name').hasClass('error')).to(equal, true);
+              expect(view.find('input#animal_type').hasClass('error')).to(equal, true);
             });
           });
         });
