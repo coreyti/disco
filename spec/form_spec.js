@@ -424,12 +424,12 @@ Screw.Unit(function() {
       
       describe("#load", function() {
         describe("when the form has #load callbacks", function() {
+          var load_callback = function() {
+            model.name = 'Sherekahn';
+          };
+
           describe("#before_load", function() {
-            var before_load_called;
-
             before(function() {
-              before_load_called = false;
-
               render_form_and_assign_element({
                 form_content: function(builder) {
                   with(builder) {
@@ -438,27 +438,23 @@ Screw.Unit(function() {
                 },
                 element_selector: 'input#model_name',
                 methods: { 
-                  before_load: function() {
-                    before_load_called = true;
-                  }
+                  before_load: load_callback
                 }
               });
             });
 
             it("fires the #before_load callback before load", function() {
-              expect(before_load_called).to(equal, false);
+              expect(model.name).to(equal, 'Dumbo');
+              expect(element.val()).to(equal, '');
               view.model = model;
               view.load();
-              expect(before_load_called).to(equal, true);
+              expect(model.name).to(equal, 'Sherekahn');
+              expect(element.val()).to(equal, 'Sherekahn');
             });
           });
 
           describe("#after_load", function() {
-            var after_load_called;
-
             before(function() {
-              after_load_called = false;
-
               render_form_and_assign_element({
                 form_content: function(builder) {
                   with(builder) {
@@ -467,18 +463,18 @@ Screw.Unit(function() {
                 },
                 element_selector: 'input#model_name',
                 methods: { 
-                  after_load: function() {
-                    after_load_called = true;
-                  }
+                  after_load: load_callback
                 }
               });
             });
 
             it("fires the #after_load callback after load", function() {
-              expect(after_load_called).to(equal, false);
+              expect(model.name).to(equal, 'Dumbo');
+              expect(element.val()).to(equal, '');
               view.model = model;
               view.load();
-              expect(after_load_called).to(equal, true);
+              expect(model.name).to(equal, 'Sherekahn');
+              expect(element.val()).to(equal, 'Dumbo');
             });
           });
         });
