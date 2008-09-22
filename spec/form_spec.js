@@ -56,7 +56,7 @@ Screw.Unit(function() {
 
         describe("when passed a model attribute name", function() {
           describe("the emitted ul tag", function() {
-            describe("when the configuration does not include constructor_name", function() {
+            describe("when the configuration does not include prefix", function() {
               it("has @id composed of 'model' and the attribute name", function() {
                 expect(element.attr('id')).to(equal, 'model_errors');
               });
@@ -70,7 +70,7 @@ Screw.Unit(function() {
               });
             });
             
-            describe("when the configuration includes constructor_name", function() {
+            describe("when the configuration includes prefix", function() {
               before(function() {
                 render_form_and_assign_element({
                   form_content: function(builder) {
@@ -81,11 +81,11 @@ Screw.Unit(function() {
                     }
                   },
                   element_selector: 'ul#animal_errors',
-                  configuration: { constructor_name: 'Animal' }
+                  configuration: { prefix: 'animal' }
                 });
               });
 
-              it("has @id composed of the constructor_name and the attribute name", function() {
+              it("has @id composed of the prefix and the attribute name", function() {
                 expect(element.attr('id')).to(equal, 'animal_errors');
               });
             });
@@ -192,13 +192,13 @@ Screw.Unit(function() {
           });
 
           describe("the emitted label tag", function() {
-            describe("when the configuration does not include constructor_name", function() {
+            describe("when the configuration does not include prefix", function() {
               it("has @for composed of 'model' and the attribute name", function() {
                 expect(element.attr('for')).to(equal, 'model_name');
               });
             });
 
-            describe("when the configuration includes constructor_name", function() {
+            describe("when the configuration includes prefix", function() {
               before(function() {
                 render_form_and_assign_element({
                   form_content: function(builder) {
@@ -207,11 +207,11 @@ Screw.Unit(function() {
                     }
                   },
                   element_selector: 'label[for=animal_name]',
-                  configuration: { constructor_name: 'Animal' }
+                  configuration: { prefix: 'animal' }
                 });
               });
 
-              it("has @for composed of constructor_name and the attribute name", function() {
+              it("has @for composed of prefix and the attribute name", function() {
                 expect(element.attr('for')).to(equal, 'animal_name');
               });
             });
@@ -235,7 +235,7 @@ Screw.Unit(function() {
               expect(element.attr('class')).to(equal, 'custom_class');
             });
 
-            describe("when the configuration includes constructor_name", function() {
+            describe("when the configuration includes prefix", function() {
               before(function() {
                 render_form_and_assign_element({
                   form_content: function(builder) {
@@ -244,11 +244,11 @@ Screw.Unit(function() {
                     }
                   },
                   element_selector: 'label[for=animal_name]',
-                  configuration: { constructor_name: 'Animal' }
+                  configuration: { prefix: 'animal' }
                 });
               });
 
-              it("has @for composed of constructor_name and the attribute name", function() {
+              it("has @for composed of prefix and the attribute name", function() {
                 expect(element.attr('for')).to(equal, 'animal_name');
               });
             });
@@ -270,7 +270,7 @@ Screw.Unit(function() {
           });
 
           describe("the emitted input tag", function() {
-            describe("when the configuration does not include constructor_name", function() {
+            describe("when the configuration does not include prefix", function() {
               it("has @id composed of 'model' and the attribute name", function() {
                 expect(element.attr('id')).to(equal, 'model_name');
               });
@@ -284,7 +284,7 @@ Screw.Unit(function() {
               });
             });
 
-            describe("when the configuration includes constructor_name", function() {
+            describe("when the configuration includes prefix", function() {
               before(function() {
                 render_form_and_assign_element({
                   form_content: function(builder) {
@@ -293,15 +293,15 @@ Screw.Unit(function() {
                     }
                   },
                   element_selector: 'input#animal_name',
-                  configuration: { constructor_name: 'Animal' }
+                  configuration: { prefix: 'animal' }
                 });
               });
 
-              it("has @id composed of constructor_name and the attribute name", function() {
+              it("has @id composed of prefix and the attribute name", function() {
                 expect(element.attr('id')).to(equal, 'animal_name');
               });
 
-              it("has @name composed of constructor_name and the attribute name", function() {
+              it("has @name composed of prefix and the attribute name", function() {
                 expect(element.attr('name')).to(equal, 'animal[name]');
               });
             });
@@ -406,7 +406,7 @@ Screw.Unit(function() {
           });
 
           describe("the emitted select tag", function() {
-            describe("when the configuration does not include constructor_name", function() {
+            describe("when the configuration does not include prefix", function() {
               it("has @id composed of 'model' and the attribute name", function() {
                 expect(element.length).to(equal, 1);
                 expect(element.attr('id')).to(equal, 'model_type');
@@ -419,7 +419,7 @@ Screw.Unit(function() {
               
             });
             
-            describe("when the configuration includes constructor_name", function() {
+            describe("when the configuration includes prefix", function() {
               before(function() {
                 render_form_and_assign_element({
                   form_content: function(builder) {
@@ -431,15 +431,15 @@ Screw.Unit(function() {
                     }
                   },
                   element_selector: 'select#animal_type',
-                  configuration: { constructor_name: 'Animal' }
+                  configuration: { prefix: 'animal' }
                 });
               });
 
-              it("has @id composed of constructor_name and the attribute name", function() {
+              it("has @id composed of prefix and the attribute name", function() {
                 expect(element.attr('id')).to(equal, 'animal_type');
               });
 
-              it("has @name composed of constructor_name and the attribute name", function() {
+              it("has @name composed of prefix and the attribute name", function() {
                 expect(element.attr('name')).to(equal, 'animal[type]');
               });
             });
@@ -592,7 +592,7 @@ Screw.Unit(function() {
       describe("#action_button", function() {
         describe("when passed the button text and action", function() {
           describe("the emitted input[@type=button] tag", function() {
-            describe("when the configuration does not include constructor_name", function() {
+            describe("when the configuration does not include prefix", function() {
               before(function() {
                 render_form_and_assign_element({
                   form_content: function(builder) {
@@ -614,7 +614,7 @@ Screw.Unit(function() {
               });
             });
 
-            describe("when the configuration includes constructor_name", function() {
+            describe("when the configuration includes prefix", function() {
               var original_action;
               var called = false;
 
@@ -626,7 +626,7 @@ Screw.Unit(function() {
                     }
                   },
                   element_selector: 'input#animal_button_save',
-                  configuration: { constructor_name: 'Animal' }
+                  configuration: { prefix: 'animal' }
                 });
 
                 original_action = view.save;
@@ -721,6 +721,45 @@ Screw.Unit(function() {
           view.model = model;
           view.load();
           expect(element.val()).to(equal, 'Dumbo');
+        });
+      });
+    });
+    
+    describe("#prefix", function() {
+      describe("when the configuration includes 'prefix'", function() {
+        before(function() {
+          render_form_and_assign_element({
+            form_content: function(builder) {
+              with(builder) {
+                input_for('name');
+              }
+            },
+            element_selector: 'input',
+            configuration: {
+              'prefix': 'custom_prefix'
+            }
+          });
+        });
+        
+        it("returns the configuration value", function() {
+          expect(element.attr('id')).to(equal, 'custom_prefix_name');
+        });
+      });
+      
+      describe("when the configuration does not include 'prefix'", function() {
+        before(function() {
+          render_form_and_assign_element({
+            form_content: function(builder) {
+              with(builder) {
+                input_for('name');
+              }
+            },
+            element_selector: 'input'
+          });
+        });
+        
+        it("returns 'model'", function() {
+          expect(element.attr('id')).to(equal, 'model_name');
         });
       });
     });
