@@ -38,14 +38,12 @@ Screw.Unit(function() {
     }
 
     describe("methods on the builder passed to the form_content function", function() {
-      describe("#messages_for", function() {
+      describe("#error_messages", function() {
         before(function() {
-          model.errors = {'type': "can't be blank", 'name': "can't be Dumbo", 'foobar': "you fool! foobar can't be bad!"};
-
           render_form_and_assign_element({
             form_content: function(builder) {
               with(builder) {
-                messages_for('errors');
+                error_messages();
                 input_for('name');
                 input_for('type');
               }
@@ -54,16 +52,16 @@ Screw.Unit(function() {
           });
         });
 
-        describe("when passed a model attribute name", function() {
-          describe("the emitted ul tag", function() {
-            it("has @id composed of 'model' and the attribute name", function() {
+        describe("rendering", function() {
+          describe("the error messages ul", function() {
+            it("has @id composed of view#prefix and 'errors'", function() {
               expect(element.attr('id')).to(equal, 'model_errors');
             });
-
-            it("has @class equal to 'messages' + the attribute name", function() {
-              expect(element.attr('class')).to(equal, 'messages errors');
+            
+            it("has @class equal to 'error_messages'", function() {
+              expect(element.attr('class')).to(equal, 'error_messages');
             });
-
+            
             it("is hidden", function() {
               expect(view.find('ul#model_errors:hidden').length).to(equal, 1);
             });
@@ -71,86 +69,100 @@ Screw.Unit(function() {
         });
         
         describe("when #load is called on the view", function() {
-          before(function() {
-            view.model = model;
-            view.load();
-          });
-          
-          describe("the form", function() {
-            it("receives a class with the message name", function() {
-              expect(view.hasClass('error')).to(equal, true);
-            })
-          });
+          describe("when the model has an 'errors' attribute", function() {
+            before(function() {
+              model.errors = {'type': "can't be blank", 'name': "can't be Dumbo", 'foobar': "you fool! foobar can't be bad!"};
 
-          describe("the message list", function() {
-            it("receives an li tag for each message, ordered by field appearance", function() {
-              var items = element.find('li');
-              expect(items.length).to(equal, 3);
-              expect(items.eq(0).html()).to(equal, "Name can't be Dumbo");
-              expect(items.eq(1).html()).to(equal, "Type can't be blank");
+              view.model = model;
+              view.load();
             });
 
-            it("receives an li tag for each message that does not match a form field", function() {
-              var items = element.find('li');
-              expect(items.eq(2).html()).to(equal, "you fool! foobar can't be bad!");
+            describe("the form", function() {
+              it("receives an 'error' class", function() {
+                expect(view.hasClass('error')).to(equal, true);
+              });
             });
 
-            it("is made visible", function() {
-              expect(view.find('ul#model_errors:visible').length).to(equal, 1);
+            describe("the error messages ul", function() {
+              it("receives an li tag for each error message, ordered by field appearance", function() {
+                var items = element.find('li');
+                expect(items.length).to(equal, 3);
+                expect(items.eq(0).html()).to(equal, "Name can't be Dumbo");
+                expect(items.eq(1).html()).to(equal, "Type can't be blank");
+              });
+
+              it("receives an li tag for each message that does not match a form field", function() {
+                var items = element.find('li');
+                expect(items.eq(2).html()).to(equal, "you fool! foobar can't be bad!");
+              });
+
+              it("is made visible", function() {
+                expect(view.find('ul#model_errors:visible').length).to(equal, 1);
+              });
+            });
+
+            describe("each form field associated with an error", function() {
+              it("receives an 'error' class", function() {
+                expect(view.find('input#model_name').hasClass('error')).to(equal, true);
+                expect(view.find('input#model_type').hasClass('error')).to(equal, true);
+              });
             });
           });
 
-          describe("each form field associated with a message", function() {
-            it("receives a class with the message name", function() {
-              expect(view.find('input#model_name').hasClass('error')).to(equal, true);
-              expect(view.find('input#model_type').hasClass('error')).to(equal, true);
+          describe("when the model does not have an 'errors' attribute", function() {
+            before(function() {
+              expect(model.errors).to(be_undefined);
+              view.model = model;
+              view.load();
             });
-          });
-        });
-        
-        describe("when #save is called on the view", function() {
-          before(function() {
-            view.model = model;
-            view.load();
-          });
 
-          describe("the form", function() {
-            it("is cleared of message class", function() {
-              expect(view.hasClass('error')).to(equal, true);
-              view.save();
+            it("does nothing", function() {
               expect(view.hasClass('error')).to(equal, false);
-            });
-          });
-          
-          describe("the message list", function() {
-            it("is cleared of any messages", function() {
-              expect(element.find('li').length).to(equal, 3);
-              view.save();
               expect(element.find('li').length).to(equal, 0);
-            });
-
-            it("is made hidden", function() {
-              expect(view.find('ul#model_errors:hidden').length).to(equal, 0);
-              expect(view.find('ul#model_errors:visible').length).to(equal, 1);
-              view.save();
-              expect(view.find('ul#model_errors:hidden').length).to(equal, 1);
               expect(view.find('ul#model_errors:visible').length).to(equal, 0);
             });
           });
-          
-          describe("each form field associated with a message", function() {
-            it("is cleared of any message class", function() {
-              expect(view.find('input#model_name').hasClass('error')).to(equal, true);
-              view.save();
-              expect(view.find('input#model_name').hasClass('error')).to(equal, false);
+        });
+
+        describe("when #save is called on the view", function() {
+          describe("when the model has an 'errors' attribute", function() {
+            before(function() {
+              model.errors = {'type': "can't be blank", 'name': "can't be Dumbo", 'foobar': "you fool! foobar can't be bad!"};
+
+              view.model = model;
+              view.load();
             });
-          });
-          
-          describe("the model", function() {
-            it("is cleared of the message attribute", function() {
-              expect(model.errors).to_not(equal, undefined);
-              view.save();
-              expect(model.errors).to(equal, undefined);
+
+            describe("the form", function() {
+              it("is cleared of the 'error' class", function() {
+                expect(view.hasClass('error')).to(equal, true);
+                view.save();
+                expect(view.hasClass('error')).to(equal, false);
+              });
+            });
+            
+            describe("the error messages ul", function() {
+              it("is cleared of any messages", function() {
+                expect(element.find('li').length).to(equal, 3);
+                view.save();
+                expect(element.find('li').length).to(equal, 0);
+              });
+              
+              it("is made hidden", function() {
+                expect(view.find('ul#model_errors:hidden').length).to(equal, 0);
+                expect(view.find('ul#model_errors:visible').length).to(equal, 1);
+                view.save();
+                expect(view.find('ul#model_errors:hidden').length).to(equal, 1);
+                expect(view.find('ul#model_errors:visible').length).to(equal, 0);
+              });
+            });
+
+            describe("each form field associated with an error", function() {
+              it("is cleared of the 'error' class", function() {
+                expect(view.find('input#model_name').hasClass('error')).to(equal, true);
+                view.save();
+                expect(view.find('input#model_name').hasClass('error')).to(equal, false);
+              });
             });
           });
         });
