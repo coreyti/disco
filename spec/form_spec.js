@@ -56,38 +56,16 @@ Screw.Unit(function() {
 
         describe("when passed a model attribute name", function() {
           describe("the emitted ul tag", function() {
-            describe("when the configuration does not include prefix", function() {
-              it("has @id composed of 'model' and the attribute name", function() {
-                expect(element.attr('id')).to(equal, 'model_errors');
-              });
-
-              it("has @class equal to 'messages' + the attribute name", function() {
-                expect(element.attr('class')).to(equal, 'messages errors');
-              });
-
-              it("is hidden", function() {
-                expect(view.find('ul#model_errors:hidden').length).to(equal, 1);
-              });
+            it("has @id composed of 'model' and the attribute name", function() {
+              expect(element.attr('id')).to(equal, 'model_errors');
             });
-            
-            describe("when the configuration includes prefix", function() {
-              before(function() {
-                render_form_and_assign_element({
-                  form_content: function(builder) {
-                    with(builder) {
-                      messages_for('errors');
-                      input_for('name');
-                      input_for('type');
-                    }
-                  },
-                  element_selector: 'ul#animal_errors',
-                  configuration: { prefix: 'animal' }
-                });
-              });
 
-              it("has @id composed of the prefix and the attribute name", function() {
-                expect(element.attr('id')).to(equal, 'animal_errors');
-              });
+            it("has @class equal to 'messages' + the attribute name", function() {
+              expect(element.attr('class')).to(equal, 'messages errors');
+            });
+
+            it("is hidden", function() {
+              expect(view.find('ul#model_errors:hidden').length).to(equal, 1);
             });
           });
         });
@@ -192,28 +170,8 @@ Screw.Unit(function() {
           });
 
           describe("the emitted label tag", function() {
-            describe("when the configuration does not include prefix", function() {
-              it("has @for composed of 'model' and the attribute name", function() {
-                expect(element.attr('for')).to(equal, 'model_name');
-              });
-            });
-
-            describe("when the configuration includes prefix", function() {
-              before(function() {
-                render_form_and_assign_element({
-                  form_content: function(builder) {
-                    with(builder) {
-                      label_for('name');
-                    }
-                  },
-                  element_selector: 'label[for=animal_name]',
-                  configuration: { prefix: 'animal' }
-                });
-              });
-
-              it("has @for composed of prefix and the attribute name", function() {
-                expect(element.attr('for')).to(equal, 'animal_name');
-              });
+            it("has @for composed of 'model' and the attribute name", function() {
+              expect(element.attr('for')).to(equal, 'model_name');
             });
           });
         });
@@ -234,24 +192,6 @@ Screw.Unit(function() {
             it("includes the given html_attributes", function() {
               expect(element.attr('class')).to(equal, 'custom_class');
             });
-
-            describe("when the configuration includes prefix", function() {
-              before(function() {
-                render_form_and_assign_element({
-                  form_content: function(builder) {
-                    with(builder) {
-                      label_for('name');
-                    }
-                  },
-                  element_selector: 'label[for=animal_name]',
-                  configuration: { prefix: 'animal' }
-                });
-              });
-
-              it("has @for composed of prefix and the attribute name", function() {
-                expect(element.attr('for')).to(equal, 'animal_name');
-              });
-            });
           });
         });
       });
@@ -270,40 +210,16 @@ Screw.Unit(function() {
           });
 
           describe("the emitted input tag", function() {
-            describe("when the configuration does not include prefix", function() {
-              it("has @id composed of 'model' and the attribute name", function() {
-                expect(element.attr('id')).to(equal, 'model_name');
-              });
-
-              it("has @name composed of 'model' and then attribute name", function() {
-                expect(element.attr('name')).to(equal, 'model[name]');
-              });
-
-              it("has @type defaulted to 'text", function() {
-                expect(element.attr('type')).to(equal, 'text');
-              });
+            it("has @id composed of 'model' and the attribute name", function() {
+              expect(element.attr('id')).to(equal, 'model_name');
             });
 
-            describe("when the configuration includes prefix", function() {
-              before(function() {
-                render_form_and_assign_element({
-                  form_content: function(builder) {
-                    with(builder) {
-                      input_for('name');
-                    }
-                  },
-                  element_selector: 'input#animal_name',
-                  configuration: { prefix: 'animal' }
-                });
-              });
+            it("has @name composed of 'model' and then attribute name", function() {
+              expect(element.attr('name')).to(equal, 'model[name]');
+            });
 
-              it("has @id composed of prefix and the attribute name", function() {
-                expect(element.attr('id')).to(equal, 'animal_name');
-              });
-
-              it("has @name composed of prefix and the attribute name", function() {
-                expect(element.attr('name')).to(equal, 'animal[name]');
-              });
+            it("has @type defaulted to 'text", function() {
+              expect(element.attr('type')).to(equal, 'text');
             });
           });
         });
@@ -406,42 +322,14 @@ Screw.Unit(function() {
           });
 
           describe("the emitted select tag", function() {
-            describe("when the configuration does not include prefix", function() {
-              it("has @id composed of 'model' and the attribute name", function() {
-                expect(element.length).to(equal, 1);
-                expect(element.attr('id')).to(equal, 'model_type');
-              });
-
-              it("has @name composed of 'model' and the attribute name", function() {
-                expect(element.length).to(equal, 1);
-                expect(element.attr('name')).to(equal, 'model[type]');
-              });
-              
+            it("has @id composed of 'model' and the attribute name", function() {
+              expect(element.length).to(equal, 1);
+              expect(element.attr('id')).to(equal, 'model_type');
             });
-            
-            describe("when the configuration includes prefix", function() {
-              before(function() {
-                render_form_and_assign_element({
-                  form_content: function(builder) {
-                    with(builder) {
-                      select_for('type', {'class': 'custom_class'}, function() {
-                        option('Elephant');
-                        option('Donkey');
-                      });
-                    }
-                  },
-                  element_selector: 'select#animal_type',
-                  configuration: { prefix: 'animal' }
-                });
-              });
 
-              it("has @id composed of prefix and the attribute name", function() {
-                expect(element.attr('id')).to(equal, 'animal_type');
-              });
-
-              it("has @name composed of prefix and the attribute name", function() {
-                expect(element.attr('name')).to(equal, 'animal[type]');
-              });
+            it("has @name composed of 'model' and the attribute name", function() {
+              expect(element.length).to(equal, 1);
+              expect(element.attr('name')).to(equal, 'model[type]');
             });
           });
         });
@@ -592,74 +480,49 @@ Screw.Unit(function() {
       describe("#action_button", function() {
         describe("when passed the button text and action", function() {
           describe("the emitted input[@type=button] tag", function() {
-            describe("when the configuration does not include prefix", function() {
-              before(function() {
-                render_form_and_assign_element({
-                  form_content: function(builder) {
-                    with(builder) {
-                      action_button('Save animal', 'save')
-                    }
-                  },
-                  element_selector: 'input#model_button_save'
-                });
+            var original_action;
+            var called = false;
+
+            before(function() {
+              render_form_and_assign_element({
+                form_content: function(builder) {
+                  with(builder) {
+                    action_button('Save animal', 'save')
+                  }
+                },
+                element_selector: 'input#model_button_save'
               });
-              
-              it("has @id composed of 'model' and the action", function() {
-                expect(element.length).to(equal, 1);
-                expect(element.attr('id')).to(equal, 'model_button_save');
-              });
-              
-              it("has @name composed of 'model' and the action", function() {
-                expect(element.attr('name')).to(equal, 'model[button][save]');
-              });
+
+              original_action = view.save;
+              view.save = function() {
+                called = true;
+              };
+            });
+            
+            after(function() {
+              view.save = original_action;
             });
 
-            describe("when the configuration includes prefix", function() {
-              var original_action;
-              var called = false;
+            it("has @id composed of 'model' and the action", function() {
+              expect(element.length).to(equal, 1);
+              expect(element.attr('id')).to(equal, 'model_button_save');
+            });
+            
+            it("has @name composed of 'model' and the action", function() {
+              expect(element.attr('name')).to(equal, 'model[button][save]');
+            });
 
-              before(function() {
-                render_form_and_assign_element({
-                  form_content: function(builder) {
-                    with(builder) {
-                      action_button('Save animal', 'save')
-                    }
-                  },
-                  element_selector: 'input#animal_button_save',
-                  configuration: { prefix: 'animal' }
-                });
+            it("has @type equal to 'button'", function() {
+              expect(element.attr('type')).to(equal, 'button');
+            });
 
-                original_action = view.save;
-                view.save = function() {
-                  called = true;
-                };
-              });
+            it("has @value equal to the text", function() {
+              expect(element.attr('value')).to(equal, 'Save animal');
+            });
 
-              after(function() {
-                view.save = original_action;
-              });
-
-              it("has @id composed of model name and the action", function() {
-                expect(element.length).to(equal, 1);
-                expect(element.attr('id')).to(equal, 'animal_button_save');
-              });
-
-              it("has @name composed of model name and action", function() {
-                expect(element.attr('name')).to(equal, 'animal[button][save]');
-              });
-
-              it("has @type equal to 'button'", function() {
-                expect(element.attr('type')).to(equal, 'button');
-              });
-
-              it("has @value equal to the text", function() {
-                expect(element.attr('value')).to(equal, 'Save animal');
-              });
-
-              it("when clicked, executes the associated action", function() {
-                element.click();
-                expect(called).to(equal, true);
-              });
+            it("when clicked, executes the associated action", function() {
+              element.click();
+              expect(called).to(equal, true);
             });
           });
         });
