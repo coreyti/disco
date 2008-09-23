@@ -47,6 +47,8 @@ Screw.Unit(function() {
                 label_for('name');
                 input_for('name');
                 input_for('type');
+                input_for('duplicate');
+                input_for('duplicate');
               }
             },
             element_selector: 'ul#model_errors'
@@ -72,7 +74,12 @@ Screw.Unit(function() {
         describe("when #load is called on the view", function() {
           describe("when the model has an 'errors' attribute", function() {
             before(function() {
-              model.errors = {'type': "can't be blank", 'name': "can't be Dumbo", 'foobar': "you fool! foobar can't be bad!"};
+              model.errors = {
+                'duplicate': 'should only see one error message',
+                'type': "can't be blank",
+                'name': "can't be Dumbo",
+                'foobar': "you fool! foobar can't be bad!"
+              };
 
               view.model = model;
               view.load();
@@ -86,19 +93,30 @@ Screw.Unit(function() {
 
             describe("the error messages ul", function() {
               it("receives an li tag for each error message, ordered by field appearance", function() {
+                var errors_length = 0;
+                $.each(model.errors, function(i, value) {
+                  errors_length ++;
+                });
+
                 var items = element.find('li');
-                expect(items.length).to(equal, 3);
+                expect(items.length).to(equal, errors_length);
                 expect(items.eq(0).html()).to(equal, "Name can't be Dumbo");
                 expect(items.eq(1).html()).to(equal, "Type can't be blank");
               });
 
-              it("receives an li tag for each message that does not match a form field", function() {
+              it("receives an li tag for each error message that does not match a form field", function() {
                 var items = element.find('li');
-                expect(items.eq(2).html()).to(equal, "you fool! foobar can't be bad!");
+                expect(items.eq(items.length - 1).html()).to(equal, "you fool! foobar can't be bad!");
               });
 
               it("is made visible", function() {
                 expect(view.find('ul#model_errors:visible').length).to(equal, 1);
+              });
+
+              describe("when multiple fields are associated with the error", function() {
+                it("only receives one li for the error message", function() {
+                  expect(element.find("li:contains('should only see one error message')").length).to(equal, 1);
+                });
               });
             });
 
