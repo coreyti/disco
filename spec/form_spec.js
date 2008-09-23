@@ -188,6 +188,14 @@ Screw.Unit(function() {
                 view.save();
                 expect(view.find('input#model_name').hasClass('error')).to(equal, false);
               });
+
+              describe("when there is a label for the field", function() {
+                it("is cleared of the 'error' class", function() {
+                  expect(view.find('label[for=model_name]').hasClass('error')).to(equal, true);
+                  view.save();
+                  expect(view.find('label[for=model_name]').hasClass('error')).to(equal, false);
+                });
+              });
             });
           });
         });
