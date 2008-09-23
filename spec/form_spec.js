@@ -44,6 +44,7 @@ Screw.Unit(function() {
             form_content: function(builder) {
               with(builder) {
                 error_messages();
+                label_for('name');
                 input_for('name');
                 input_for('type');
               }
@@ -105,6 +106,12 @@ Screw.Unit(function() {
               it("receives an 'error' class", function() {
                 expect(view.find('input#model_name').hasClass('error')).to(equal, true);
                 expect(view.find('input#model_type').hasClass('error')).to(equal, true);
+              });
+
+              describe("when there is a label for the field", function() {
+                it("receives an 'error' class", function() {
+                  expect(view.find('label[for=model_name]').hasClass('error')).to(equal, true);
+                });
               });
             });
           });
