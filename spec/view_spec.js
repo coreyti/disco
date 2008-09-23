@@ -155,7 +155,8 @@ Screw.Unit(function() {
         var it_does_not_raise_for_undefined = function(missing_definition) {
           describe("when " + missing_definition + " is undefined", function() {
             before(function() {
-              delete eval(missing_definition);
+              missing_definition = eval(missing_definition);
+              delete missing_definition;
               merged_template = Disco.inherit(layout, template);
             });
 
