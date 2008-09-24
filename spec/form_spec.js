@@ -38,6 +38,30 @@ Screw.Unit(function() {
     }
 
     describe("methods on the builder passed to the form_content function", function() {
+      var it_returns_a_form_builder = function(function_definition, args) {
+        describe("when calling " + function_definition + " on the view", function() {
+          var returned_object;
+          
+          before(function() {
+            render_form_and_assign_element({
+              form_content: function(builder) {
+                returned_object = builder[function_definition](args);
+              }
+            });
+          });
+
+          it("a Disco.Form.Builder object is returned", function() {
+            expect(returned_object instanceof Disco.Form.Builder).to(equal, true);
+          });
+        });
+      };
+      
+      it_returns_a_form_builder('error_messages');
+      it_returns_a_form_builder('label_for', 'name');
+      it_returns_a_form_builder('input_for', 'name');
+      it_returns_a_form_builder('select_for', 'name');
+      it_returns_a_form_builder('action_button', 'save');
+
       describe("#error_messages", function() {
         before(function() {
           render_form_and_assign_element({
@@ -53,6 +77,10 @@ Screw.Unit(function() {
             },
             element_selector: 'ul#model_errors'
           });
+        });
+        
+        describe("returned value", function() {
+          
         });
 
         describe("rendering", function() {
