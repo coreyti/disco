@@ -132,8 +132,8 @@ Screw.Unit(function() {
         });
         
         it("overrides methods in the layout with methods in the template that share the same name", function() {
-          expect(merged_template.name).to_not(equal, layout.name);
-          expect(merged_template.name).to(equal, template.name);
+          expect(merged_template.name()).to_not(equal, layout.name());
+          expect(merged_template.name()).to(equal, template.name());
         });
         
         it("combines the methods hashes of the layout and the inheriting template, giving priority to the inheriting template", function() {

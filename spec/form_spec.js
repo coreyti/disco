@@ -249,6 +249,25 @@ Screw.Unit(function() {
           });
         });
         
+        describe("when passed a model attribute name and a custom label", function() {
+          before(function() {
+            render_form_and_assign_element({
+              form_content: function(builder) {
+                with(builder) {
+                  label_for('name', 'Fahrvergnügen');
+                }
+              },
+              element_selector: 'label[for=model_name]'
+            });
+          });
+
+          describe("the emitted label tag", function() {
+            it("has a label of the custom text instead of the attribute name", function() {
+              expect(element.html()).to(equal, 'Fahrvergnügen');
+            });
+          });
+        });
+        
         describe("when passed a model attribute name and html_attributes", function() {
           before(function() {
             render_form_and_assign_element({
