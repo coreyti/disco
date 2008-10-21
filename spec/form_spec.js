@@ -249,6 +249,25 @@ Screw.Unit(function() {
           });
         });
         
+        describe("when passed a model attribute name and html_attributes", function() {
+          before(function() {
+            render_form_and_assign_element({
+              form_content: function(builder) {
+                with(builder) {
+                  label_for('name', { 'class': 'custom_class' });
+                }
+              },
+              element_selector: 'label[for=model_name]'
+            });
+          });
+
+          describe("the emitted label tag", function() {
+            it("includes the given html_attributes", function() {
+              expect(element.attr('class')).to(equal, 'custom_class');
+            });
+          });
+        });
+
         describe("when passed a model attribute name and a custom label", function() {
           before(function() {
             render_form_and_assign_element({
@@ -268,12 +287,54 @@ Screw.Unit(function() {
           });
         });
         
-        describe("when passed a model attribute name and html_attributes", function() {
+        describe("when passed a model attribute name and a function", function() {
           before(function() {
             render_form_and_assign_element({
               form_content: function(builder) {
                 with(builder) {
-                  label_for('name', { 'class': 'custom_class' });
+                  label_for('name', function() { span('Volkswagen'); });
+                }
+              },
+              element_selector: 'label[for=model_name]'
+            });
+          });
+          
+          describe("the emitted label tag", function() {
+            it("uses the value of the function as its body", function() {
+              expect(element.find('span').html()).to(equal, "Volkswagen");
+            });
+          });
+        });
+        
+        describe("when passed a model attribute name, a custom label, and html_attributes", function() {
+          before(function() {
+            render_form_and_assign_element({
+              form_content: function(builder) {
+                with(builder) {
+                  label_for('name', 'Fahrvergnügen', { 'class': 'custom_class' });
+                }
+              },
+              element_selector: 'label[for=model_name]'
+            });
+          });
+          
+          describe("the emitted label tag", function() {
+            it("has a label of the custom text instead of the attribute name", function() {
+              expect(element.html()).to(equal, 'Fahrvergnügen');
+            });
+
+            it("includes the given html_attributes", function() {
+              expect(element.attr('class')).to(equal, 'custom_class');
+            });
+          });
+        });
+        
+        describe("when passed a model attribute name, html_attributes, and a function", function() {
+          before(function() {
+            render_form_and_assign_element({
+              form_content: function(builder) {
+                with(builder) {
+                  label_for('name', { 'class': 'custom_class' }, function() { span('Volkswagen'); });
                 }
               },
               element_selector: 'label[for=model_name]'
@@ -281,6 +342,10 @@ Screw.Unit(function() {
           });
 
           describe("the emitted label tag", function() {
+            it("uses the value of the function as its body", function() {
+              expect(element.find('span').html()).to(equal, 'Volkswagen');
+            });
+
             it("includes the given html_attributes", function() {
               expect(element.attr('class')).to(equal, 'custom_class');
             });
