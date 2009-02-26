@@ -44,6 +44,11 @@ Screw.Unit(function() {
         builder.tag("div", "some text", {'class': "baz"});
         expect(builder.to_string()).to(match, '<div class="baz">some text</div>');
       });
+      
+      it("with a self closing tag, generates a valid XHTML tag", function() {
+        builder.tag("br");
+        expect(builder.to_string()).to(equal, "<br />");
+      });
     });
 
     describe("#text", function() {
