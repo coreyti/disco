@@ -1,0 +1,3 @@
+screw-unit:
+  repo: git://github.com/nathansobo/screw-unit.git
+  path: vendor
